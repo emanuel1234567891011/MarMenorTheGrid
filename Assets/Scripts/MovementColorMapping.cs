@@ -154,7 +154,6 @@ public class MovementColorMapping : MonoBehaviour
             binaryMatrix[18, 4] = 1;
             binaryMatrix[18, 3] = 1;
             binaryMatrix[18, 2] = 1; 
-        InvokeRepeating("UpdateMethod", 0.5f, 0.5f);
         }
         else
         {
@@ -162,7 +161,7 @@ public class MovementColorMapping : MonoBehaviour
         }
     }
 
-    void UpdateMethod()
+    void Update()
     {
         UpdateObject(BlueMarineDrone, ref blueLastPosition, currentColor);
 

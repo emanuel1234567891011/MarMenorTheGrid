@@ -6,7 +6,6 @@ public class DroneAvion : Drone
 {
     // Marine-specific properties and methods
     public string type; // Replace with the actual property
-    public Transform target; // The target that the drone will move towards
     public float speed = 5f; // The speed at which the drone will move
     public float turnSpeed = 5f; // The speed at which the drone will turn
 
@@ -38,11 +37,17 @@ public class DroneAvion : Drone
 
     void Update()
     {
-        if (isWorking && target != null)
+        if (isWorking)
         {
-            // Move towards the target
-            Vector3 direction = (target.position - transform.position).normalized;
-            rb.velocity = direction * speed;
+            // Move the drone along the x-axis from 0 to 699
+            if (transform.position.x < 699)
+            {
+                rb.velocity = new Vector3(speed, 0, 0);
+            }
+            else
+            {
+                rb.velocity = Vector3.zero; // Stop the drone when it reaches 699
+            }
         }
     }
 }
