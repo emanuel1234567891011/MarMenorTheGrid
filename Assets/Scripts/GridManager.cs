@@ -1,8 +1,9 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
-    public GameObject objectToTrack; // Assign in inspector
+    public List<GameObject> objectsToTrack; // Assign in inspector
     public int gridWidth = 700; // Width of the grid
     public int gridHeight = 700; // Height of the grid
     public float cellSize = 1.0f; // Grid cell size
@@ -12,28 +13,57 @@ public class GridManager : MonoBehaviour
 
     void Start()
     {
-        if (objectToTrack == null)
+        if (objectsToTrack == null)
         {
-            Debug.LogError("Object to track is not assigned!");
-            return;
+            objectsToTrack = new List<GameObject>(); // Ensure the list is initialized
         }
-
         cleanedGrid = new bool[gridWidth, gridHeight]; // Initialize the cleaned grid
-        InvokeRepeating("CheckObjectPosition", 0.0f, checkInterval);
     }
+
 
     void Update()
     {
         DrawGrid();
     }
 
+    public void StartCheckingObjectPosition()
+    {
+        InvokeRepeating("CheckObjectPosition", 0.0f, checkInterval);
+    }
+
+    public void StopCheckingObjectPosition()
+    {
+        CancelInvoke("CheckObjectPosition");
+    }
+
     void CheckObjectPosition()
     {
-        Vector3 objectPosition = objectToTrack.transform.position;
-        int gridX = Mathf.Clamp(Mathf.FloorToInt(objectPosition.x / cellSize), 0, gridWidth - 1);
-        int gridZ = Mathf.Clamp(Mathf.FloorToInt(objectPosition.z / cellSize), 0, gridHeight - 1);
+        if (objectsToTrack == null)
+        {
+            Debug.LogError("Objects to track list is null");
+            return;
+        }
 
-        cleanedGrid[gridX, gridZ] = true; // Mark the cell as cleaned
+        foreach (GameObject objectToTrack in objectsToTrack)
+        {
+            if (objectToTrack == null)
+            {
+                Debug.LogError("An object in objectsToTrack is null");
+                continue; // Skip this iteration
+            }
+
+            if (objectToTrack.transform == null)
+            {
+                Debug.LogError("Object transform is null");
+                continue; // Skip this iteration
+            }
+
+            Vector3 objectPosition = objectToTrack.transform.position;
+            int gridX = Mathf.Clamp(Mathf.FloorToInt(objectPosition.x / cellSize), 0, gridWidth - 1);
+            int gridZ = Mathf.Clamp(Mathf.FloorToInt(objectPosition.z / cellSize), 0, gridHeight - 1);
+
+            cleanedGrid[gridX, gridZ] = true; // Mark the cell as cleaned
+        }
 
         // Calculate the cleaned area percentage
         int cleanedCells = 0;
@@ -42,10 +72,9 @@ public class GridManager : MonoBehaviour
             if (cell) cleanedCells++;
         }
         cleanedPercentage = (float)cleanedCells / (gridWidth * gridHeight) * 100;
-
-        Debug.Log($"Object is at grid position: {gridX}, {gridZ}");
         Debug.Log($"Cleaned area: {cleanedPercentage}%");
     }
+
 
     void DrawGrid()
     {

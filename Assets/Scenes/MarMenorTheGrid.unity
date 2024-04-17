@@ -1077,7 +1077,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 521522529}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1567375103}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: AddDrone
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &521522529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1595,8 +1607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3b9e02299ffc5c8eb9a82c387af0ed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectToTrack: {fileID: 70434957915502022, guid: 0cb286a575d075a67bff33fbdf092887,
-    type: 3}
+  objectsToTrack: []
   gridWidth: 700
   gridHeight: 700
   cellSize: 1
@@ -4345,7 +4356,6 @@ MonoBehaviour:
   dronesList: []
   timerText: {fileID: 549097128}
   batteryLifeText: {fileID: 118641494}
-  cleanedAreaText: {fileID: 1361277784}
   nameInputField: {fileID: 1735568706}
   capacityInputField: {fileID: 1129577985}
   batteryInputField: {fileID: 621958284}
@@ -4354,6 +4364,8 @@ MonoBehaviour:
   copiesInputField: {fileID: 985738107}
   addButton: {fileID: 521522528}
   distance: 2
+  gridManager: {fileID: 658372129}
+  cleanedAreaText: {fileID: 1361277784}
 --- !u!4 &1567375104
 Transform:
   m_ObjectHideFlags: 0

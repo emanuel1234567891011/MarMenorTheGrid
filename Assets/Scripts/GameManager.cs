@@ -1,42 +1,35 @@
 using UnityEngine;
-using TMPro; // Namespace for TextMeshPro
+using TMPro;
 using System.Collections.Generic;
-using UnityEngine.UI; // Required for UI components like Button
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public Camera myCamera;
-    private GameObject selectedObject; // The currently selected object
-    private Color originalColor; // The original color of the selected object
+    private GameObject selectedObject;
+    private Color originalColor;
 
-    public GameObject dronePrefab; // The drone prefab
+    public GameObject dronePrefab;
     public List<Drone> dronesList = new List<Drone>();
-    
-    public TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI component for displaying the timer
-    public TextMeshProUGUI batteryLifeText; // Reference to the TextMeshProUGUI for displaying battery life
-    public TextMeshProUGUI cleanedAreaText; // ADDITION: Reference for displaying the cleaned area percentage
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI batteryLifeText;
     public TMP_InputField nameInputField;
     public TMP_InputField capacityInputField;
     public TMP_InputField batteryInputField;
     public TMP_InputField velocityMeanInputField;
     public TextMeshProUGUI droneListText;
-    public TMP_InputField copiesInputField; // Assign in the Unity Editor
-    public Button addButton; // Assign in the Unity Editor
+    public TMP_InputField copiesInputField;
+    public Button addButton;
     public float distance = 2.0f; // Distance between each instantiated object
 
-    private List<GameObject> targetList;
+    public GridManager gridManager; // The GridManager instance
+    public TextMeshProUGUI cleanedAreaText; // The TextMeshProUGUI to display the cleaned area percentage
+
     private float timer = 0.0f;
     private bool isTimerRunning = false;
-    private GridManager gridManager; // Reference to the GridManager
 
     void Start()
     {
-        gridManager = UnityEngine.Object.FindFirstObjectByType<GridManager>();
-        if (gridManager == null)
-        {
-            Debug.LogError("GridManager not found in the scene!");
-        }
-        targetList = new List<GameObject>(Resources.LoadAll<GameObject>("Target"));
         addButton.onClick.AddListener(OnAddButtonClicked);
     }
 
@@ -47,30 +40,11 @@ public class GameManager : MonoBehaviour
             timer += Time.deltaTime;
             timerText.text = $"Time: {timer:F2}";
             UpdateBatteryLifeDisplay();
-            if (gridManager != null)
-            {
-                float cleanedPercentage = gridManager.GetCleanedPercentage();
-                cleanedAreaText.text = $"Cleaned Area: {cleanedPercentage:F8}%";
-            }
         }
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 mousePosition = Input.mousePosition;  
-            Ray myRay = myCamera.ScreenPointToRay(mousePosition);
-            RaycastHit raycastHit;
-            if (Physics.Raycast(myRay, out raycastHit))
-            {
-                selectedObject = raycastHit.transform.gameObject;
-                MeshRenderer renderer = selectedObject.GetComponent<MeshRenderer>();
-                originalColor = renderer.material.color;
-                renderer.material.color = Color.red;
-            }
-        }
-        if (Input.GetMouseButtonUp(0) && selectedObject != null)
-        {
-            selectedObject.GetComponent<MeshRenderer>().material.color = originalColor;
-            selectedObject = null;
-        }
+
+        // Get the cleaned area percentage from the GridManager and display it
+        float cleanedPercentage = gridManager.GetCleanedPercentage();
+        cleanedAreaText.text = $"Cleaned Area: {cleanedPercentage:F6}%";
     }
 
     private void UpdateBatteryLifeDisplay()
@@ -97,6 +71,7 @@ public class GameManager : MonoBehaviour
         {
             drone.StartWork();
         }
+        gridManager.StartCheckingObjectPosition(); // Start checking the object's position
         StartTimer();
     }
 
@@ -106,6 +81,7 @@ public class GameManager : MonoBehaviour
         {
             drone.StopWork();
         }
+        gridManager.StopCheckingObjectPosition(); // Stop checking the object's position
         StopTimer();
     }
 
@@ -118,6 +94,7 @@ public class GameManager : MonoBehaviour
         newDrone.Battery = float.Parse(batteryInputField.text);
         newDrone.Capacity = int.Parse(capacityInputField.text);
         dronesList.Add(newDrone);
+        gridManager.objectsToTrack.Add(droneObject); // Ensure this line is working correctly
         UpdateDroneListUI();
     }
 
@@ -150,19 +127,16 @@ public class GameManager : MonoBehaviour
     {
         string inputName = nameInputField.text;
         int numberOfCopies = int.Parse(copiesInputField.text);
-        GameObject prefab = targetList.Find(p => p.name == inputName);
-        if (prefab != null)
+        Vector3 position = Vector3.zero; // Start position for the first drone
+
+        for (int i = 0; i < numberOfCopies; i++)
         {
-            Vector3 position = Vector3.zero;
-            for (int i = 0; i < numberOfCopies; i++)
-            {
-                GameObject newObj = Instantiate(prefab, position, Quaternion.identity);
-                position += new Vector3(distance, 0, 0);
-            }
-        }
-        else
-        {
-            Debug.LogError("Prefab not found");
+            GameObject newDroneObject = Instantiate(dronePrefab, position, Quaternion.identity);
+            Drone newDrone = newDroneObject.GetComponent<Drone>();
+            newDrone.Name = inputName;
+            dronesList.Add(newDrone);
+            gridManager.objectsToTrack.Add(newDroneObject); // Ensure this line is working correctly
+            position += new Vector3(distance, 0, 0); // Update the position for the next drone
         }
     }
 }

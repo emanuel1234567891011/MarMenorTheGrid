@@ -12,8 +12,8 @@ public class DroneMarino : Drone
 
     public State currentState = State.Navigate;
     public string type;
-    public float speed = 1f;
-    public float turnSpeed = 1f;
+    public float speed = 10f;
+    public float turnSpeed = 10f;
     public Vector3 chargingPoint; // The location of the charging point
 
     private Rigidbody rb;
@@ -33,7 +33,9 @@ public class DroneMarino : Drone
     public override void StartWork()
     {
         isWorking = true;
+        currentState = State.Navigate; // Set the drone to navigate when work starts
     }
+
 
     public override void StopWork()
     {

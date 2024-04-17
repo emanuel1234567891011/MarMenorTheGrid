@@ -14,8 +14,7 @@ GameObject:
   - component: {fileID: 2280675200552721288}
   - component: {fileID: 4301155146721418251}
   - component: {fileID: 753406624260544702}
-  - component: {fileID: 3403105819514270616}
-  - component: {fileID: 1444739501986678849}
+  - component: {fileID: 2165706123571275518}
   m_Layer: 0
   m_Name: BlueDrone
   m_TagString: DetectableCube
@@ -151,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   message: This is a drone
---- !u!114 &3403105819514270616
+--- !u!114 &2165706123571275518
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -160,38 +159,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 70434957915502022}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a801871d250e4aaaeb2bd3a1d3883f3e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 1
-  speed: 1
---- !u!114 &1444739501986678849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 70434957915502022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1b5412cba10a3f73be68dc1786ba3b5, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a4db74aa713d23788f95eec72949e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
-  Speed: 0
+  Speed: 1
   Battery: 0
   Capacity: 0
-  Behavior: 
-  TargetRigidbody: {fileID: 0}
-  DepthBeforeSub: 0
-  DisplacementAmount: 0
-  floaters: 0
-  WaterDrag: 0
-  WaterAngularDrag: 0
-  Water: {fileID: 0}
-  currentState: 0
+  Behavior: Drone
+  currentState: 1
   type: 
-  speed: 0
-  turnSpeed: 0
+  speed: 1
+  turnSpeed: 1
   chargingPoint: {x: 0, y: 0, z: 0}
-  batteryTime: 0
+  batteryTime: 100
