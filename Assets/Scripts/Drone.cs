@@ -7,6 +7,7 @@ public class Drone : MonoBehaviour
     public float Battery;   // Battery
     public int Capacity;   // Capacity
     public string Behavior; // Behavior
+    public Vector3 lastPosition;
 
     
 

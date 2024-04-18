@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI droneListText;
     public TMP_InputField copiesInputField;
     public Button addButton;
+    public Button removeButton; // The remove button
     public float distance = 2.0f; // Distance between each instantiated object
 
     public GridManager gridManager; // The GridManager instance
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         addButton.onClick.AddListener(OnAddButtonClicked);
+        removeButton.onClick.AddListener(OnRemoveButtonClicked); // Add a listener for the remove button
     }
 
     void Update()
@@ -94,8 +96,20 @@ public class GameManager : MonoBehaviour
         newDrone.Battery = float.Parse(batteryInputField.text);
         newDrone.Capacity = int.Parse(capacityInputField.text);
         dronesList.Add(newDrone);
-        gridManager.objectsToTrack.Add(droneObject); // Ensure this line is working correctly
+        gridManager.objectsToTrack.Add(droneObject); // Add the drone to the objects to track
         UpdateDroneListUI();
+    }
+
+    public void RemoveDrone()
+    {
+        if (dronesList.Count > 0)
+        {
+            Drone droneToRemove = dronesList[dronesList.Count - 1]; // Get the last drone
+            dronesList.Remove(droneToRemove); // Remove the drone from the drones list
+            gridManager.objectsToTrack.Remove(droneToRemove.gameObject); // Remove the drone from the objects to track
+            Destroy(droneToRemove.gameObject); // Destroy the drone game object
+            UpdateDroneListUI();
+        }
     }
 
     private void StartTimer()
@@ -135,8 +149,13 @@ public class GameManager : MonoBehaviour
             Drone newDrone = newDroneObject.GetComponent<Drone>();
             newDrone.Name = inputName;
             dronesList.Add(newDrone);
-            gridManager.objectsToTrack.Add(newDroneObject); // Ensure this line is working correctly
+            gridManager.objectsToTrack.Add(newDroneObject); // Add the drone to the objects to track
             position += new Vector3(distance, 0, 0); // Update the position for the next drone
         }
+    }
+
+    void OnRemoveButtonClicked()
+    {
+        RemoveDrone(); // Call the RemoveDrone method when the remove button is clicked
     }
 }
