@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DroneMarino : Drone
 {
@@ -15,6 +16,7 @@ public class DroneMarino : Drone
     public float speed = 10f;
     public float turnSpeed = 10f;
     public Vector3 chargingPoint; // The location of the charging point
+    public List<Vector3> positions = new List<Vector3>(); // List to store the positions
 
     private Rigidbody rb;
     private bool isWorking = false;
@@ -36,7 +38,6 @@ public class DroneMarino : Drone
         currentState = State.Navigate; // Set the drone to navigate when work starts
     }
 
-
     public override void StopWork()
     {
         isWorking = false;
@@ -50,6 +51,9 @@ public class DroneMarino : Drone
 
         // Define the target position
         Vector3 targetPosition = new Vector3(0, transform.position.y, 699);
+
+        // Add the current position to the list
+        positions.Add(transform.position);
 
         switch (currentState)
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
-    public List<GameObject> objectsToTrack; // Assign in inspector
+    public GameManager gameManager; // Reference to the GameManager
     public int gridWidth = 700; // Width of the grid
     public int gridHeight = 700; // Height of the grid
     public float cellSize = 1.0f; // Grid cell size
@@ -13,13 +13,8 @@ public class GridManager : MonoBehaviour
 
     void Start()
     {
-        if (objectsToTrack == null)
-        {
-            objectsToTrack = new List<GameObject>(); // Ensure the list is initialized
-        }
         cleanedGrid = new bool[gridWidth, gridHeight]; // Initialize the cleaned grid
     }
-
 
     void Update()
     {
@@ -38,29 +33,19 @@ public class GridManager : MonoBehaviour
 
     void CheckObjectPosition()
     {
-        if (objectsToTrack == null)
-        {
-            Debug.LogError("Objects to track list is null");
-            return;
-        }
+        List<Drone> dronesList = gameManager.dronesList; // Get the drones list from the GameManager
 
-        foreach (GameObject objectToTrack in objectsToTrack)
+        foreach (Drone drone in dronesList)
         {
-            if (objectToTrack == null)
+            if (drone == null)
             {
-                Debug.LogError("An object in objectsToTrack is null");
+                Debug.LogError("A drone in dronesList is null");
                 continue; // Skip this iteration
             }
 
-            if (objectToTrack.transform == null)
-            {
-                Debug.LogError("Object transform is null");
-                continue; // Skip this iteration
-            }
-
-            Vector3 objectPosition = objectToTrack.transform.position;
-            int gridX = Mathf.Clamp(Mathf.FloorToInt(objectPosition.x / cellSize), 0, gridWidth - 1);
-            int gridZ = Mathf.Clamp(Mathf.FloorToInt(objectPosition.z / cellSize), 0, gridHeight - 1);
+            Vector3 dronePosition = drone.transform.position;
+            int gridX = Mathf.Clamp(Mathf.FloorToInt(dronePosition.x / cellSize), 0, gridWidth - 1);
+            int gridZ = Mathf.Clamp(Mathf.FloorToInt(dronePosition.z / cellSize), 0, gridHeight - 1);
 
             cleanedGrid[gridX, gridZ] = true; // Mark the cell as cleaned
         }
@@ -96,3 +81,5 @@ public class GridManager : MonoBehaviour
         return cleanedPercentage;
     }
 }
+
+

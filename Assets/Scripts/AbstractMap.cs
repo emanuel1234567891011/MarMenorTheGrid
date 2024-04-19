@@ -1,8 +1,10 @@
 using UnityEngine;
 using System.IO;
+using System.Collections.Generic; // For List
 
 public class AbstractMap : MonoBehaviour
 {
+    public GameManager gameManager;
     public Texture2D texture;
     private Vector3 blueLastPosition;
     private Color currentColor = Color.blue;
@@ -10,8 +12,6 @@ public class AbstractMap : MonoBehaviour
     public int gridSizeX = 40;
     public int gridSizeY = 20;
     private int[,] binaryMatrix; // Binary matrix to represent land and sea
-
-    public GridManager gridManager; // Reference to the GridManager
 
     void Start()
     {
@@ -21,12 +21,6 @@ public class AbstractMap : MonoBehaviour
             texture = Instantiate(texture);
             pixels = texture.GetPixels();
             binaryMatrix = new int[texture.width / gridSizeX, texture.height / gridSizeY]; // Initialize binary matrix
-
-            // Initialize last positions for each object in objectsToTrack
-            foreach (GameObject obj in gridManager.objectsToTrack)
-            {
-                obj.GetComponent<Drone>().lastPosition = obj.transform.position;
-            }
 
             // Manually set all cells to be land
             for (int x = 0; x < binaryMatrix.GetLength(0); x++)
@@ -169,10 +163,16 @@ public class AbstractMap : MonoBehaviour
 
     void Update()
     {
-        // Update each object in objectsToTrack
-        foreach (GameObject obj in gridManager.objectsToTrack)
+        // Get drone list from game manager
+        List<Drone> drones = gameManager.dronesList;
+
+        // Color cells based on drone positions
+        foreach (Drone drone in drones)
         {
-            UpdateObject(obj, ref obj.GetComponent<Drone>().lastPosition, currentColor);
+            Vector3 dronePosition = drone.transform.position;
+            int cellX = (int)(dronePosition.x / gridSizeX);
+            int cellY = (int)(dronePosition.y / gridSizeY);
+            ColorCell(cellX, cellY, Color.blue); // Color cell with red color
         }
 
         // Color cells based on binary matrix
@@ -190,47 +190,6 @@ public class AbstractMap : MonoBehaviour
         DrawGrid(new Color(1f, 1f, 1f, 0.1f));
         texture.SetPixels(pixels);
         texture.Apply();
-    }
-
-    void UpdateObject(GameObject obj, ref Vector3 lastPos, Color color)
-    {
-        // Check if the GameObject is null before accessing its properties
-        if (obj == null)
-        {
-            Debug.LogWarning("GameObject is null.");
-            return;
-        }
-
-        Vector3 currentPosition = obj.transform.position;
-
-        if (Vector3.Distance(currentPosition, lastPos) > 0.01f)
-        {
-            int xOffset = 625;
-            int zOffset = 60;
-
-            int x = Mathf.Clamp(Mathf.FloorToInt(obj.transform.position.x) + xOffset, 0, texture.width - 1);
-            int z = Mathf.Clamp(Mathf.FloorToInt(obj.transform.position.z) + zOffset, 0, texture.height - 1);
-
-            int thickness = 1;
-
-            for (int i = -thickness; i <= thickness; i++)
-            {
-                for (int j = -thickness; j <= thickness; j++)
-                {
-                    int xi = Mathf.Clamp(x + i, 0, texture.width - 1);
-                    int zj = Mathf.Clamp(z + j, 0, texture.height - 1);
-
-                    pixels[zj * texture.width + xi] = Color.blue; // Use blue color
-                }
-            }
-
-            texture.SetPixels(pixels);
-            texture.Apply();
-
-            Debug.Log($"Colored pixel at ({x}, {z})");
-        }
-
-        lastPos = currentPosition;
     }
 
     void OnApplicationQuit()

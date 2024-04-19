@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public Camera myCamera;
-    private GameObject selectedObject;
+    private GameObject selectedObject; 
     private Color originalColor;
 
     public GameObject dronePrefab;
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
         newDrone.Battery = float.Parse(batteryInputField.text);
         newDrone.Capacity = int.Parse(capacityInputField.text);
         dronesList.Add(newDrone);
-        gridManager.objectsToTrack.Add(droneObject); // Add the drone to the objects to track
+        
         UpdateDroneListUI();
     }
 
@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
         {
             Drone droneToRemove = dronesList[dronesList.Count - 1]; // Get the last drone
             dronesList.Remove(droneToRemove); // Remove the drone from the drones list
-            gridManager.objectsToTrack.Remove(droneToRemove.gameObject); // Remove the drone from the objects to track
+            
             Destroy(droneToRemove.gameObject); // Destroy the drone game object
             UpdateDroneListUI();
         }
@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour
             Drone newDrone = newDroneObject.GetComponent<Drone>();
             newDrone.Name = inputName;
             dronesList.Add(newDrone);
-            gridManager.objectsToTrack.Add(newDroneObject); // Add the drone to the objects to track
+            
             position += new Vector3(distance, 0, 0); // Update the position for the next drone
         }
     }
