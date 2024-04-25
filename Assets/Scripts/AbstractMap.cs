@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.IO;
-using System.Collections.Generic; // For List
+using System.Collections.Generic;
 
 public class AbstractMap : MonoBehaviour
 {
@@ -9,8 +9,6 @@ public class AbstractMap : MonoBehaviour
     private Vector3 blueLastPosition;
     private Color currentColor = Color.blue;
     private Color[] pixels;
-    public int gridSizeX = 40;
-    public int gridSizeY = 20;
     private int[,] binaryMatrix; // Binary matrix to represent land and sea
 
     void Start()
@@ -20,7 +18,7 @@ public class AbstractMap : MonoBehaviour
             Debug.Log("Texture is readable.");
             texture = Instantiate(texture);
             pixels = texture.GetPixels();
-            binaryMatrix = new int[texture.width / gridSizeX, texture.height / gridSizeY]; // Initialize binary matrix
+            binaryMatrix = new int[gameManager.gridManager.gridWidth, gameManager.gridManager.gridHeight]; // Initialize binary matrix
 
             // Manually set all cells to be land
             for (int x = 0; x < binaryMatrix.GetLength(0); x++)
@@ -31,129 +29,8 @@ public class AbstractMap : MonoBehaviour
                 }
             }
 
-            // Set three specific cells to be land
-            binaryMatrix[18, 1] = 1;
-            binaryMatrix[17, 1] = 1; 
-            binaryMatrix[16, 1] = 1;
-            binaryMatrix[15, 1] = 1;
-            binaryMatrix[14, 1] = 1; // increase y by 1 
-            binaryMatrix[14, 2] = 1; 
-            binaryMatrix[14, 3] = 1;
-            binaryMatrix[13, 3] = 1;
-            binaryMatrix[13, 4] = 1;
-            binaryMatrix[12, 3] = 1;
-            binaryMatrix[12, 4] = 1;
-            binaryMatrix[12, 5] = 1;
-            binaryMatrix[11, 5] = 1;
-            binaryMatrix[11, 6] = 1;
-            binaryMatrix[10, 6] = 1;
-            binaryMatrix[10, 7] = 1;
-            binaryMatrix[10, 8] = 1; 
-            binaryMatrix[9, 8] = 1;
-            binaryMatrix[9, 9] = 1;
-            binaryMatrix[9, 10] = 1; 
-            binaryMatrix[8, 10] = 1;
-            binaryMatrix[8, 11] = 1;
-            binaryMatrix[8, 12] = 1; 
-            binaryMatrix[8, 13] = 1;
-            binaryMatrix[7, 13] = 1;
-            binaryMatrix[7, 14] = 1;
-            binaryMatrix[7, 15] = 1;
-            binaryMatrix[7, 16] = 1;
-            binaryMatrix[7, 17] = 1; 
-            binaryMatrix[7, 18] = 1;
-            binaryMatrix[6, 18] = 1;
-            binaryMatrix[6, 19] = 1;
-            binaryMatrix[6, 20] = 1;
-            binaryMatrix[6, 21] = 1;
-            binaryMatrix[6, 22] = 1;
-            binaryMatrix[6, 23] = 1;
-            binaryMatrix[5, 23] = 1;
-            binaryMatrix[5, 24] = 1;
-            binaryMatrix[5, 25] = 1;
-            binaryMatrix[5, 26] = 1;
-            binaryMatrix[5, 27] = 1;
-            binaryMatrix[5, 28] = 1; 
-            binaryMatrix[5, 29] = 1;
-            binaryMatrix[6, 28] = 1; 
-            binaryMatrix[6, 29] = 1;
-            binaryMatrix[6, 30] = 1;
-            binaryMatrix[7, 30] = 1;
-            binaryMatrix[7, 31] = 1;
-            binaryMatrix[7, 32] = 1;
-            binaryMatrix[7, 33] = 1; 
-            binaryMatrix[8, 33] = 1; 
-            binaryMatrix[9, 33] = 1;
-            binaryMatrix[9, 34] = 1; 
-            binaryMatrix[9, 35] = 1;
-            binaryMatrix[10, 35] = 1;
-            binaryMatrix[10, 36] = 1; 
-            binaryMatrix[11, 36] = 1;
-            binaryMatrix[11, 37] = 1;
-            binaryMatrix[11, 38] = 1; 
-            binaryMatrix[12, 38] = 1;
-            binaryMatrix[12, 39] = 1;
-            binaryMatrix[12, 40] = 1;
-            binaryMatrix[12, 41] = 1; 
-            binaryMatrix[13, 41] = 1;
-            binaryMatrix[13, 42] = 1;
-            binaryMatrix[13, 43] = 1;
-            binaryMatrix[13, 44] = 1; 
-            binaryMatrix[13, 45] = 1;
-            binaryMatrix[13, 46] = 1; 
-            binaryMatrix[14, 46] = 1;
-            binaryMatrix[15, 46] = 1;
-            binaryMatrix[15, 47] = 1; 
-            binaryMatrix[16, 47] = 1;
-            binaryMatrix[17, 47] = 1;
-            binaryMatrix[18, 47] = 1; // decrease y by 1 
-            binaryMatrix[18, 46] = 1; 
-            binaryMatrix[18, 45] = 1;
-            binaryMatrix[18, 44] = 1;
-            binaryMatrix[18, 43] = 1;
-            binaryMatrix[18, 42] = 1;
-            binaryMatrix[18, 41] = 1;
-            binaryMatrix[18, 40] = 1;
-            binaryMatrix[18, 39] = 1;
-            binaryMatrix[18, 38] = 1;
-            binaryMatrix[18, 37] = 1;
-            binaryMatrix[18, 36] = 1;
-            binaryMatrix[18, 35] = 1;
-            binaryMatrix[18, 34] = 1;
-            binaryMatrix[18, 33] = 1;
-            binaryMatrix[18, 32] = 1;
-            binaryMatrix[18, 31] = 1;
-            binaryMatrix[18, 30] = 1;
-            binaryMatrix[18, 29] = 1;
-            binaryMatrix[18, 28] = 1;
-            binaryMatrix[18, 27] = 1;
-            binaryMatrix[18, 26] = 1;
-            binaryMatrix[18, 25] = 1;
-            binaryMatrix[18, 24] = 1;
-            binaryMatrix[18, 23] = 1;
-            binaryMatrix[17, 23] = 1;
-            binaryMatrix[17, 22] = 1;
-            binaryMatrix[17, 21] = 1;
-            binaryMatrix[17, 20] = 1;
-            binaryMatrix[17, 19] = 1;
-            binaryMatrix[17, 18] = 1;
-            binaryMatrix[17, 17] = 1;
-            binaryMatrix[17, 16] = 1;
-            binaryMatrix[17, 15] = 1;
-            binaryMatrix[17, 14] = 1;
-            binaryMatrix[17, 13] = 1;
-            binaryMatrix[17, 12] = 1;
-            binaryMatrix[17, 11] = 1;
-            binaryMatrix[17, 10] = 1;
-            binaryMatrix[17, 9] = 1;
-            binaryMatrix[18, 9] = 1; 
-            binaryMatrix[18, 8] = 1;
-            binaryMatrix[18, 7] = 1;
-            binaryMatrix[18, 6] = 1;
-            binaryMatrix[18, 5] = 1;
-            binaryMatrix[18, 4] = 1;
-            binaryMatrix[18, 3] = 1;
-            binaryMatrix[18, 2] = 1; 
+            // Set specific cells to be sea based on your requirements
+            // binaryMatrix[x, y] = 1;
         }
         else
         {
@@ -163,6 +40,9 @@ public class AbstractMap : MonoBehaviour
 
     void Update()
     {
+        // Get cleanedGrid from GridManager instance
+        bool[,] cleanedGrid = gameManager.gridManager.cleanedGrid;
+
         // Get drone list from game manager
         List<Drone> drones = gameManager.dronesList;
 
@@ -170,9 +50,9 @@ public class AbstractMap : MonoBehaviour
         foreach (Drone drone in drones)
         {
             Vector3 dronePosition = drone.transform.position;
-            int cellX = (int)(dronePosition.x / gridSizeX);
-            int cellY = (int)(dronePosition.y / gridSizeY);
-            ColorCell(cellX, cellY, Color.blue); // Color cell with red color
+            int cellX = (int)(dronePosition.x / gameManager.gridManager.gridWidth);
+            int cellY = (int)(dronePosition.y / gameManager.gridManager.gridHeight);
+            ColorCell(cellX, cellY, Color.blue); // Color cell with blue color
         }
 
         // Color cells based on binary matrix
@@ -211,7 +91,7 @@ public class AbstractMap : MonoBehaviour
         {
             for (int y = 0; y < texture.height; y++)
             {
-                if (x % gridSizeX == 0 || y % gridSizeY == 0)
+                if (x % gameManager.gridManager.gridWidth == 0 || y % gameManager.gridManager.gridHeight == 0)
                 {
                     pixels[y * texture.width + x] = color;
                 }
@@ -224,13 +104,13 @@ public class AbstractMap : MonoBehaviour
     void ColorCell(int cellX, int cellY, Color color)
     {
         // Calculate the pixel coordinates of the top left corner of the cell
-        int startX = cellX * gridSizeX;
-        int startY = cellY * gridSizeY;
+        int startX = cellX * gameManager.gridManager.gridWidth;
+        int startY = cellY * gameManager.gridManager.gridHeight;
 
         // Color the pixels within the cell
-        for (int x = startX; x < startX + gridSizeX && x < texture.width; x++)
+        for (int x = startX; x < startX + gameManager.gridManager.gridWidth && x < texture.width; x++)
         {
-            for (int y = startY; y < startY + gridSizeY && y < texture.height; y++)
+            for (int y = startY; y < startY + gameManager.gridManager.gridHeight && y < texture.height; y++)
             {
                 pixels[y * texture.width + x] = color;
             }

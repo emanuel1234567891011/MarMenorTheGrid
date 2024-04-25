@@ -8,7 +8,10 @@ public class GridManager : MonoBehaviour
     public int gridHeight = 700; // Height of the grid
     public float cellSize = 1.0f; // Grid cell size
     private float checkInterval = 1.0f; // How often to check the object's position
-    private bool[,] cleanedGrid; // 2D array to keep track of cleaned cells
+
+    // Make cleanedGrid public
+    public bool[,] cleanedGrid; // 2D array to keep track of cleaned cells
+
     private float cleanedPercentage = 0.0f; // Store the cleaned area percentage
 
     void Start()
@@ -60,7 +63,6 @@ public class GridManager : MonoBehaviour
         Debug.Log($"Cleaned area: {cleanedPercentage}%");
     }
 
-
     void DrawGrid()
     {
         for (int x = 0; x <= gridWidth; x++)
@@ -81,5 +83,6 @@ public class GridManager : MonoBehaviour
         return cleanedPercentage;
     }
 }
+
 
 
