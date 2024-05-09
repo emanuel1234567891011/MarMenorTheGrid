@@ -1,13 +1,18 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using System;
 
 public class GridManager : MonoBehaviour
 {
     public GameManager gameManager; // Reference to the GameManager
+    public MeshRenderer plane;
+    public Texture2D bitMap;
     public int gridWidth = 700; // Width of the grid
     public int gridHeight = 700; // Height of the grid
     public float cellSize = 1.0f; // Grid cell size
     private float checkInterval = 1.0f; // How often to check the object's position
+    private bool[,] mapValues;
 
     // Make cleanedGrid public
     public bool[,] cleanedGrid; // 2D array to keep track of cleaned cells
@@ -16,12 +21,14 @@ public class GridManager : MonoBehaviour
 
     void Start()
     {
-        cleanedGrid = new bool[gridWidth, gridHeight]; // Initialize the cleaned grid
+        //cleanedGrid = new bool[gridWidth, gridHeight]; // Initialize the cleaned grid
+        mapValues = new bool[bitMap.height, bitMap.width];
+        StartCoroutine(GetMapValues(bitMap));
     }
 
     void Update()
     {
-        DrawGrid();
+        //DrawGrid();
     }
 
     public void StartCheckingObjectPosition()
@@ -63,19 +70,48 @@ public class GridManager : MonoBehaviour
         Debug.Log($"Cleaned area: {cleanedPercentage}%");
     }
 
-    void DrawGrid()
+    //todo Get the bitmap values => List<bool>
+    private IEnumerator GetMapValues(Texture2D bitMap)
     {
-        for (int x = 0; x <= gridWidth; x++)
-        {
-            for (int z = 0; z <= gridHeight; z++)
+        Color[] colors = bitMap.GetPixels();
+        int xDimesnion = bitMap.width;
+        int zDimension = bitMap.height;
+        Debug.Log($"Color length: {colors.Length}");
+
+        int mapIndex = 0;
+        for (int i = 0; i < bitMap.height; i++)
+            for (int j = 0; j < bitMap.width; j++)
             {
-                // Vertical lines
-                Debug.DrawLine(new Vector3(x * cellSize, 0, 0), new Vector3(x * cellSize, 0, gridHeight * cellSize), Color.blue);
-                // Horizontal lines
-                Debug.DrawLine(new Vector3(0, 0, z * cellSize), new Vector3(gridWidth * cellSize, 0, z * cellSize), Color.blue);
+                mapValues[i, j] = colors[mapIndex].b == 1.00 ? true : false;
+                mapIndex++;
             }
-        }
+            
+        yield return 0;
+
+        //Texture2D tex = new Texture2D(bitMap.width, bitMap.height);
+        //Color[] c = new Color[bitMap.width * bitMap.height];
+        //int textIndex = 0;
+        //for (int i = 0; i < mapValues.GetLength(0); i++)
+        //    for (int j = 0; j < mapValues.GetLength(1); j++)
+        //    {
+        //        if(mapValues[i,j] == true)
+        //        {
+        //            c[textIndex] = Color.blue;
+        //        } else
+        //        {
+        //            c[textIndex] = Color.red;
+        //        }
+
+        //        textIndex++;
+                
+        //    }
+
+        //tex.SetPixels(c);
+        //tex.Apply();
+        //plane.material.mainTexture = tex;
     }
+
+    //todo Draw grid
 
     // Provide a public method to access the cleaned percentage
     public float GetCleanedPercentage()
