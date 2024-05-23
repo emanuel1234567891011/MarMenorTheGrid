@@ -67,25 +67,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void StartSimulation()
-    {
-        foreach (Drone drone in dronesList)
-        {
-            drone.StartWork();
-        }
-        // gridManager.StartCheckingObjectPosition(); // Start checking the object's position
-        StartTimer();
-    }
-
-    public void StopSimulation()
-    {
-        foreach (Drone drone in dronesList)
-        {
-            drone.StopWork();
-        }
-        // gridManager.StopCheckingObjectPosition(); // Stop checking the object's position
-        StopTimer();
-    }
 
     public void AddDrone()
     {
