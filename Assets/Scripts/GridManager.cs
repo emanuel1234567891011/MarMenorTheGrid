@@ -1,14 +1,13 @@
 using UnityEngine;
 using System.Collections;
 using Unity.Mathematics;
-using UnityEngine.Rendering;
-using Pathfinding;
-using Unity.VisualScripting;
 using System.Collections.Generic;
-using System;
 
 public class GridManager : MonoBehaviour
 {
+    [Header("References")]
+    public VoronoiUtility voronoiUtility;
+
     [Header("Map Data")]
     public MeshRenderer quad;
     public Texture2D bitMap;
@@ -21,6 +20,10 @@ public class GridManager : MonoBehaviour
     private float gs;
     private Vector3 offsetPos;
     private float startTime;
+
+    [Header("Drones")]
+    public int droneCount = 10;
+    private List<MapCellData> droneStartingPoints = new List<MapCellData>();
 
     void Start()
     {
@@ -43,8 +46,10 @@ public class GridManager : MonoBehaviour
         for (int i = 0; i < mapCells.GetLength(0); i++)
             for (int j = 0; j < mapCells.GetLength(1); j++)
             {
-                mapCells[i, j].xPos = offsetPos.x * 2 + i * gs;
-                mapCells[i, j].zPos = offsetPos.y * 2 + j * gs;
+                mapCells[i, j].xIndex = i;
+                mapCells[i, j].yIndex = j;
+                mapCells[i, j].xPos = offsetPos.x * 2 + i * gs + gs / 2;
+                mapCells[i, j].zPos = offsetPos.y * 2 + j * gs + gs / 2;
 
                 Color wholeColor = new Color(Mathf.RoundToInt(bitMap.GetPixel(i, j).r), Mathf.RoundToInt(bitMap.GetPixel(i, j).g), Mathf.RoundToInt(bitMap.GetPixel(i, j).b), 1);
                 if (wholeColor == Color.black)
@@ -75,8 +80,40 @@ public class GridManager : MonoBehaviour
 
         tex.Apply();
         quad.material.mainTexture = tex;
+        quad.material.mainTexture.filterMode = FilterMode.Point;
 
         Debug.Log($"Grid took {Time.time - startTime} to finish.");
+
+        DefineDroneStartingPositions(mapCells);
+
+        yield return 0;
+
+        List<MapCellData> waterStartingLocations = new List<MapCellData>(); //! refactor
+        droneStartingPoints.ForEach(x =>
+        {
+            if (x.isWater)
+                waterStartingLocations.Add(x);
+        });
+
+        Vector2Int[] centroids = new Vector2Int[waterStartingLocations.Count];
+
+        for (int i = 0; i < waterStartingLocations.Count; i++)
+            if (waterStartingLocations[i].isWater)
+                centroids[i] = new Vector2Int(waterStartingLocations[i].xIndex, waterStartingLocations[i].yIndex);
+
+        quad.material.mainTexture = voronoiUtility.CreateDiagram(new Vector2Int(bitMap.width, bitMap.height), centroids);
+    }
+
+    private void DefineDroneStartingPositions(MapCellData[,] grid)
+    {
+        //? How to evenly space out the grid to ensure the correct number of drones based on aspect ration of gird.
+
+        int xSteps = Mathf.FloorToInt(grid.GetLength(0) / droneCount);
+        int ySteps = Mathf.FloorToInt(grid.GetLength(1) / droneCount);
+
+        for (int i = 0; i < droneCount; i++)
+            for (int j = 0; j < droneCount; j++)
+                droneStartingPoints.Add(grid[i * xSteps, j * ySteps]);
     }
 
     private void OnDrawGizmos()
@@ -91,23 +128,33 @@ public class GridManager : MonoBehaviour
             });
         }
 
-        //! CREATE A SQUARE IN EACH CORNER.
-        //! Fix the slight offset in the grid locations.
+        Gizmos.color = Color.magenta;
+
+        if (droneStartingPoints.Count > 0)
+        {
+            droneStartingPoints.ForEach(x =>
+            {
+                if (x.isWater)
+                    Gizmos.DrawSphere(new Vector3(x.xPos, 0, x.zPos), .25f);
+            });
+        }
     }
 }
 
-//todo border check.
-
 public struct MapCellData
 {
-    public MapCellData(float x, float z, bool water, bool borderPosition)
+    public MapCellData(int xI, int yI, float x, float z, bool water, bool borderPosition)
     {
+        xIndex = xI;
+        yIndex = yI;
         xPos = x;
         zPos = z;
         isWater = water;
         isBorder = borderPosition;
     }
 
+    public int xIndex;
+    public int yIndex;
     public float xPos;
     public float zPos;
     public bool isWater;
