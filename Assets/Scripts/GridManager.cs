@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections;
-using Unity.Mathematics;
 using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
+    public GameObject DebugCube;
+
     [Header("References")]
     public VoronoiUtility voronoiUtility;
 
@@ -24,6 +25,7 @@ public class GridManager : MonoBehaviour
     [Header("Drones")]
     public int droneCount = 10;
     private List<MapCellData> droneStartingPoints = new List<MapCellData>();
+    private Vector2Int[] centroids;
 
     void Start()
     {
@@ -88,32 +90,29 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
-        List<MapCellData> waterStartingLocations = new List<MapCellData>(); //! refactor
-        droneStartingPoints.ForEach(x =>
+        Vector2Int[] centroids = new Vector2Int[droneCount];
+        for (int i = 0; i < droneCount; i++)
         {
-            if (x.isWater)
-                waterStartingLocations.Add(x);
-        });
-
-        Vector2Int[] centroids = new Vector2Int[waterStartingLocations.Count];
-
-        for (int i = 0; i < waterStartingLocations.Count; i++)
-            if (waterStartingLocations[i].isWater)
-                centroids[i] = new Vector2Int(waterStartingLocations[i].xIndex, waterStartingLocations[i].yIndex);
+            centroids[i] = new Vector2Int(UnityEngine.Random.Range(0, bitMap.width), UnityEngine.Random.Range(0, bitMap.height / 2));
+            Vector2Int gridPos = new Vector2Int(centroids[i].x, centroids[i].y);
+            Vector3 pos = new Vector3(mapCells[gridPos.x, gridPos.y].xPos, 0, mapCells[gridPos.x, gridPos.y].zPos);
+            Instantiate(DebugCube, pos, Quaternion.identity);
+            Debug.Log($"Centroid X: {centroids[i].x} : Centroid Y: {centroids[i].y}");
+        }
 
         quad.material.mainTexture = voronoiUtility.CreateDiagram(new Vector2Int(bitMap.width, bitMap.height), centroids);
     }
 
     private void DefineDroneStartingPositions(MapCellData[,] grid)
     {
-        //? How to evenly space out the grid to ensure the correct number of drones based on aspect ration of gird.
+        // //? How to evenly space out the grid to ensure the correct number of drones based on aspect ration of gird.
 
-        int xSteps = Mathf.FloorToInt(grid.GetLength(0) / droneCount);
-        int ySteps = Mathf.FloorToInt(grid.GetLength(1) / droneCount);
+        // int xSteps = Mathf.FloorToInt(grid.GetLength(0) / droneCount);
+        // int ySteps = Mathf.FloorToInt(grid.GetLength(1) / droneCount);
 
-        for (int i = 0; i < droneCount; i++)
-            for (int j = 0; j < droneCount; j++)
-                droneStartingPoints.Add(grid[i * xSteps, j * ySteps]);
+        // for (int i = 0; i < droneCount; i++)
+        //     for (int j = 0; j < droneCount; j++)
+        //         droneStartingPoints.Add(grid[i * xSteps, j * ySteps]);
     }
 
     private void OnDrawGizmos()
@@ -138,6 +137,15 @@ public class GridManager : MonoBehaviour
                     Gizmos.DrawSphere(new Vector3(x.xPos, 0, x.zPos), .25f);
             });
         }
+
+        //? Consider the translation between the 2D grid and the 3D world is not accurate.
+        if (centroids != null && centroids.Length > 0)
+            for (int i = 0; i < centroids.Length; i++)
+            {
+                Vector2Int gridPos = new Vector2Int(centroids[i].x, centroids[i].y);
+                Vector3 pos = new Vector3(mapCells[gridPos.x, gridPos.y].xPos, 0, mapCells[gridPos.x, gridPos.y].zPos);
+                Gizmos.DrawSphere(pos, 1);
+            }
     }
 }
 

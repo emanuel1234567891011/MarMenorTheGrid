@@ -2065,11 +2065,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3b9e02299ffc5c8eb9a82c387af0ed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugCube: {fileID: 1397935872211697810, guid: 4d1cc6394463f4b40a6025e118ab5faa,
+    type: 3}
   voronoiUtility: {fileID: 1979950135}
   quad: {fileID: 691111783}
   bitMap: {fileID: 2800000, guid: 1fad13909abd94df9a68cbe9260fad59, type: 3}
   gridXLength: 100
-  droneCount: 50
+  droneCount: 2
 --- !u!4 &658372130
 Transform:
   m_ObjectHideFlags: 0

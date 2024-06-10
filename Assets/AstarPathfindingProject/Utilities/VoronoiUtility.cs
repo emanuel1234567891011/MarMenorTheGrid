@@ -6,13 +6,9 @@ public class VoronoiUtility : MonoBehaviour
     public Texture2D CreateDiagram(Vector2Int dimensions, Vector2Int[] centroids)
     {
         Color[] regionColors = new Color[centroids.Length];
-        Vector2Int[] randomC = new Vector2Int[centroids.Length];
 
         for (int i = 0; i < centroids.Length; i++)
-        {
             regionColors[i] = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
-            randomC[i] = new Vector2Int(Random.Range(0, dimensions.x), Random.Range(0, dimensions.x));
-        }
 
         Color[] pixelColors = new Color[dimensions.x * dimensions.y];
 
@@ -20,7 +16,7 @@ public class VoronoiUtility : MonoBehaviour
             for (int y = 0; y < dimensions.y; y++)
             {
                 int index = x * dimensions.x + y; //! index is not accounting for non-square textures.
-                pixelColors[index] = regionColors[GetClosestCentroidIndex(new Vector2Int(x, y), randomC)];
+                pixelColors[index] = regionColors[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
             }
 
         return GetImageFromColorArray(dimensions, pixelColors);
