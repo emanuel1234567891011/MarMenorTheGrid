@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0d9007a4bfcfbc348ba8d5e12661307b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201019
+  packageName: Voronoi Image Generator
+  packageVersion: 1.0
+  assetPath: Assets/VoronoiImageGenerator/Test/Voronoi.mat
+  uploadId: 447766

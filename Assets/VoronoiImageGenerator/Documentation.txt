@@ -1,0 +1,73 @@
+[Voronoi Image Generator]
+
+[CREDITS]
+
+Developed by Unity Asset Store Publisher: Dozed
+https://assetstore.unity.com/publishers/28998
+
+Contacts:
+Website: https://github.com/Dozed12
+Email: frantommor@gmail.com
+
+[SUMMARY]
+
+    A fast, shader-based Voronoi image generator with customizable distance metrics, site influence strength and wrapping ability.
+
+[FEATURES]
+
+    - URP and SRP compatible.
+
+    - High Performance: Using shaders to generate Voronoi images on the GPU with minimal performance impact.
+
+    - Voronoi Image Tiling: Able to wrap Voronoi images horizontally and/or vertically for a tiling effect.
+    Toroidal Distance used to maintain the same performance as without wrapping.
+
+    - All Distance Metrics: Voronoi Image generation using Eucledian, Manhattan or Chebyshev distance metrics.
+
+    - Generalized Distance Metric: Generalized Minkowski distance metric to define a custom distance metric.
+
+    - Site Influence Strength: Different strength values for different Voronoi sites.
+
+[USAGE & SETTINGS]
+
+    The Voronoi Generator is statically defined so you do not need to include anything in your scene to use it.
+
+    As a non-scene shader, you need to include it to the list of "Always included Shaders" to build the project.
+    This is found in "Edit > Project Settings > Graphics > Always included Shaders"
+
+    Simply define the generator settings and call VoronoiGenerator.GenerateVoronoi(...) to obtain the resulting RenderTexture.
+
+    The following settings can be changed:
+        - VoronoiGenerator.distanceFormula - Distance formula Eucledian, Manhattan, Chebyshev or Minkowski
+        - VoronoiGenerator.minkowskiP - Set Minkowski P value for Minkowski Distance (https://en.wikipedia.org/wiki/Minkowski_distance)
+        - VoronoiGenerator.wrapHorizontal - Set Horizontal wrapping True or False
+        - VoronoiGenerator.wrapVertical - Set Vertical wrapping True or False
+        - VoronoiGenerator.siteRadius - Radius of site circle in UV texture size (percentage of Voronoi size)
+            Setting to 0 removes the circle.
+
+    VoronoiGenerator.GenerateVoronoi(...) takes as parameters the size of the Voronoi image in pixels, a list of sites as Vector2
+    with the coordinates of each site in pixels, a list of colors corresponding to the sites and optionally a list of float
+    strengths corresponding to each site.
+    The strength value increases the influence of each site making it control a larger area. Sites with the same strength behave
+    between them as expected by the distance metric. If a strength value is not provided the value is set to 1 for all sites.
+
+    The RenderTexture produced by the VoronoiGenerator.GenerateVoronoi(...) is then ready for use directly on a texture
+    or to make any spatial analysis you may desire. As with all RenderTextures, the tiling can be adjusted by changing its
+    wrapMode, making use of the Voronoi wrap.
+
+    The provided VoronoiTest.cs and TestScene explore the various features of the asset and provides examples of its usage.
+
+[PERFORMANCE]
+
+    The performance of the Voronoi generator depends primarily on the size of the Voronoi image and on the number of sites used.
+
+    The performance of every distance metric is approximatelly the same.
+
+    When using Horizontal and/or Vertical wrapping, the distance metrics are Toroidal Aware, meaning they are optimized
+    to perform as fast as without wrapping.
+
+[CLOSING]
+
+Thank you for purchasing this asset.
+
+If you need any help, support or even have suggestions or requests feel free to contact me by email

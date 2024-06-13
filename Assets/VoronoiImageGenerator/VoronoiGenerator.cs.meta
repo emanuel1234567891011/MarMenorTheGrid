@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 01c73126343b54a47bbd4c5484c6cb5e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201019
+  packageName: Voronoi Image Generator
+  packageVersion: 1.0
+  assetPath: Assets/VoronoiImageGenerator/VoronoiGenerator.cs
+  uploadId: 447766
