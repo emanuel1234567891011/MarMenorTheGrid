@@ -1,14 +1,15 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
+using System;
 
 public class GridManager : MonoBehaviour
 {
-    public GameObject DebugCube;
+    public MarineDrone dronePrefab;
 
     [Header("References")]
     public VoronoiUtility voronoiUtility;
+    public LoadingBar loadingBar;
 
     [Header("Map Data")]
     public MeshRenderer quad;
@@ -26,10 +27,11 @@ public class GridManager : MonoBehaviour
     [Header("Drones")]
     public int droneCount = 10;
     private List<MapCellData> droneStartingPoints = new List<MapCellData>();
-    private Vector2Int[] centroids;
 
     void Start()
     {
+        loadingBar.Show();
+
         startTime = Time.time;
 
         mapCells = new MapCellData[bitMap.width, bitMap.height];
@@ -42,11 +44,13 @@ public class GridManager : MonoBehaviour
 
         gs = quad.GetComponent<MeshRenderer>().bounds.size.x / bitMap.width;
 
-        StartCoroutine(GetMapValues(bitMap));
+        StartCoroutine(GenerateMap(bitMap));
     }
 
-    private IEnumerator GetMapValues(Texture2D bitMap)
+    private IEnumerator GenerateMap(Texture2D bitMap)
     {
+        loadingBar.UpdateProgress("Converting bitmap to map values...", 1, 5);
+
         for (int i = 0; i < mapCells.GetLength(0); i++)
             for (int j = 0; j < mapCells.GetLength(1); j++)
             {
@@ -57,22 +61,32 @@ public class GridManager : MonoBehaviour
 
                 Color wholeColor = new Color(Mathf.RoundToInt(bitMap.GetPixel(i, j).r), Mathf.RoundToInt(bitMap.GetPixel(i, j).g), Mathf.RoundToInt(bitMap.GetPixel(i, j).b), 1);
                 if (wholeColor == Color.black)
-                {
                     mapCells[i, j].isBorder = true;
-                    borderCells.Add(mapCells[i, j]);
-                }
                 else if (wholeColor == Color.blue)
                     mapCells[i, j].isWater = true;
             }
 
         yield return 0;
 
-        FlipGridHorizontal();
+        loadingBar.UpdateProgress("Creating world bitmap...", 2, 5);
 
-        mapCells = RotateGrid90(mapCells);
+        FlipGridHorizontal(mapCells);
 
+        //mapCells = RotateGrid90(mapCells);
+        MapCellData[,] vdata = RotateGrid90(mapCells);
+
+        Color w = Color.white;
+        for (int i = 0; i < mapCells.GetLength(0); i++)
+            for (int j = 0; j < mapCells.GetLength(1); j++)
+            {
+                w = new Color(Mathf.RoundToInt(bitMap.GetPixel(i, j).r), Mathf.RoundToInt(bitMap.GetPixel(i, j).g), Mathf.RoundToInt(bitMap.GetPixel(i, j).b), 1);
+                if (w == Color.black)
+                    borderCells.Add(mapCells[i, j]);
+            }
 
         yield return 0;
+
+        loadingBar.UpdateProgress("Applying world bitmap to geo...", 3, 5);
 
         Texture2D tex = new Texture2D(bitMap.width, bitMap.height);
         int texIndex = 0;
@@ -95,73 +109,162 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
-        Vector2Int[] centroids = new Vector2Int[droneCount];
-        // centroids[0] = new Vector2Int(50, 100);
-        // centroids[1] = new Vector2Int(200, 400);
-        // centroids[2] = new Vector2Int(450, 650);
-        // centroids[3] = new Vector2Int(550, 700);
-        // centroids[4] = new Vector2Int(800, 1000);
+        loadingBar.UpdateProgress("Generating drone spawn locations...", 4, 5);
 
-        for (int i = 0; i < droneCount; i++)
+        int dimensions = Mathf.RoundToInt(Mathf.Sqrt(droneCount));
+        Vector2Int[] c1 = new Vector2Int[dimensions * dimensions];
+        int xDim = bitMap.width / dimensions;
+        int droneIndex = 0;
+        int dronesInWater = 0;
+        for (int i = 0; i < dimensions; i++)
         {
+            for (int y = 0; y < dimensions; y++)
+            {
+                int xC = xDim / 2 + xDim * y;
+                int yC = xDim / 2 + xDim * i;
 
-            centroids[i] = new Vector2Int(UnityEngine.Random.Range(0, bitMap.width), UnityEngine.Random.Range(0, bitMap.height / 2));
-            //centroids[i] = new Vector2Int(UnityEngine.Random.Range(0, bitMap.width), UnityEngine.Random.Range(0, bitMap.height / 2)); //? Creates full texture
-            Vector2Int gridPos = new Vector2Int(centroids[i].x, centroids[i].y);
-            Vector3 pos = new Vector3(mapCells[gridPos.x, gridPos.y].xPos, 0, mapCells[gridPos.x, gridPos.y].zPos);
-            Instantiate(DebugCube, pos, Quaternion.identity);
-            Debug.Log($"Centroid X: {centroids[i].x} : Centroid Y: {centroids[i].y}");
-            //! Something wrong with offset or scaling of positions for the grid locations, using same grid locations as the Gizmo (line 115) but different positions.
+                c1[droneIndex] = new Vector2Int(xC, yC);
+                droneIndex++;
+
+                if (vdata[xC, yC].isWater)
+                    dronesInWater++;
+            }
         }
 
-        //3d grid position 1. flip horizontally, rotate by 90 degrees
+        Color[] regionColorsC1 = new Color[c1.Length];
+        for (int i = 0; i < c1.Length; i++)
+            regionColorsC1[i] = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 1f);
 
-        Vector2Int[] corners = new Vector2Int[4];
-        corners[0] = new Vector2Int(0, 0); //bottom left
-        corners[1] = new Vector2Int(mapCells.GetLength(0) - 1, 0); //bottom right
-        corners[2] = new Vector2Int(0, mapCells.GetLength(1) / 2 - 1); //top right
-        corners[3] = new Vector2Int(mapCells.GetLength(0) - 1, mapCells.GetLength(1) / 2 - 1);
+        Array.Resize(ref c1, dronesInWater);
+        droneIndex = 0;
 
-        for (int i = 0; i < corners.Length; i++)
-            Debug.Log("Corner: " + corners[i]);
-
-        for (int i = 0; i < corners.Length; i++)
+        for (int i = 0; i < dimensions; i++)
         {
-            Vector2Int gridPos = new Vector2Int(corners[i].x, corners[i].y);
-            Vector3 pos = new Vector3(mapCells[gridPos.x, gridPos.y].xPos, 0, mapCells[gridPos.x, gridPos.y].zPos);
-            GameObject d = Instantiate(DebugCube, pos, Quaternion.identity);
-            d.GetComponent<MeshRenderer>().material.color = Color.green;
-            d.gameObject.name = corners[i].ToString();
+            for (int y = 0; y < dimensions; y++)
+            {
+                int xC = xDim / 2 + xDim * y;
+                int yC = xDim / 2 + xDim * i;
+
+                if (vdata[xC, yC].isWater)
+                {
+                    c1[droneIndex] = new Vector2Int(xC, yC);
+                    droneIndex++;
+                }
+            }
         }
 
-        yield return new WaitForSeconds(1);
+        for (int i = 0; i < c1.Length; i++)
+        {
+            //todo get values x = 0 - width, y = 0 - height / 2
+            Vector2Int gridPos = new Vector2Int(c1[i].x, c1[i].y);
+            Vector3 pos = new Vector3(vdata[gridPos.x, gridPos.y].xPos, 0, vdata[gridPos.x, gridPos.y].zPos);
+            MarineDrone d = Instantiate(dronePrefab, pos, Quaternion.identity);
+            d.Initialize(regionColorsC1[i], vdata);
+            //d.name = $"C1:{i}. X: {gridPos.x}, Y: {gridPos.y}.";
+        }
 
-        quad.material.mainTexture = voronoiUtility.CreateDiagram(new Vector2Int(bitMap.width, bitMap.height), centroids);
-        //quad.material.mainTexture = voronoiUtility.CreateDiagram(new Vector2Int(bitMap.width, bitMap.height / 2), centroids); //? creates full texture
+        Vector2Int[] c2 = new Vector2Int[dimensions * dimensions];
+        droneIndex = 0;
+        dronesInWater = 0;
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int y = 0; y < dimensions; y++)
+            {
+                int xC = (bitMap.height / 2) + xDim / 2 + xDim * y;
+                int yC = xDim / 2 + xDim * i;
 
+                c2[droneIndex] = new Vector2Int(xC, yC);
+                droneIndex++;
+
+                if (vdata[xC, yC].isWater)
+                    dronesInWater++;
+            }
+        }
+
+
+        Color[] regionColorsC2 = new Color[c2.Length];
+        for (int i = 0; i < c1.Length; i++)
+            regionColorsC2[i] = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 1f);
+
+        Array.Resize(ref c2, dronesInWater);
+        droneIndex = 0;
+
+        for (int i = 0; i < dimensions; i++)
+        {
+            for (int y = 0; y < dimensions; y++)
+            {
+                int xC = (bitMap.height / 2) + xDim / 2 + xDim * y;
+                int yC = xDim / 2 + xDim * i;
+
+                if (vdata[xC, yC].isWater)
+                {
+                    c2[droneIndex] = new Vector2Int(xC, yC);
+                    droneIndex++;
+                }
+            }
+        }
+
+        for (int i = 0; i < c2.Length; i++)
+        {
+            //todo get values x = width - height, y = 0 - width
+            Vector2Int gridPos = new Vector2Int(c2[i].x, c2[i].y);
+            Vector3 pos = new Vector3(vdata[gridPos.x, gridPos.y].xPos, 0, vdata[gridPos.x, gridPos.y].zPos);
+            MarineDrone d = Instantiate(dronePrefab, pos, Quaternion.identity);
+            d.Initialize(regionColorsC2[i], vdata);
+            //d.name = $"C2:{i}. X: {gridPos.x}, Y: {gridPos.y}.";
+        }
+
+        for (int i = 0; i < c2.Length; i++)
+            c2[i].x -= 1024;
+
+        Texture2D voronoiDiagram = Combine2Textures(voronoiUtility.CreateDiagram(regionColorsC1, new Vector2Int(bitMap.width, bitMap.height / 2),
+            c1), voronoiUtility.CreateDiagram(regionColorsC2, new Vector2Int(bitMap.width, bitMap.height / 2), c2));
+        quad.material.mainTexture = voronoiDiagram;
+
+        yield return 0;
+
+        loadingBar.UpdateProgress("Combining bitmap with voronoi diagram...", 5, 5);
+
+        //? add this functionality to the voronoi utility itself.
+        for (int x = 0; x < voronoiDiagram.width; x++)
+            for (int y = 0; y < voronoiDiagram.height; y++)
+            {
+                int index = x * voronoiDiagram.width + y;
+                Color wholeColor = new Color(Mathf.RoundToInt(bitMap.GetPixel(x, y).r), Mathf.RoundToInt(bitMap.GetPixel(x, y).g), Mathf.RoundToInt(bitMap.GetPixel(x, y).b), 1);
+                if (wholeColor == Color.red)
+                    voronoiDiagram.SetPixel(x, y, Color.red);
+                if (wholeColor == Color.black)
+                    voronoiDiagram.SetPixel(x, y, Color.black);
+            }
+
+        voronoiDiagram.Apply();
+
+        yield return 0;
+
+        loadingBar.Hide();
     }
 
-    //! Debug flip, refactor later
-    public void FlipGridHorizontal()
+    private Texture2D Combine2Textures(Texture2D _textureA, Texture2D _textureB)
     {
-        for (int i = 0; i < mapCells.GetLength(0); i++)
+        Texture2D combinedImagePair = new Texture2D(_textureA.width, _textureA.height + _textureB.height);
+        combinedImagePair.SetPixels(0, 0, _textureA.width, _textureA.height, _textureA.GetPixels(), 0);
+        combinedImagePair.SetPixels(0, _textureB.width, _textureB.width, _textureB.height, _textureB.GetPixels(), 0);
+        combinedImagePair.filterMode = FilterMode.Point;
+        combinedImagePair.Apply();
+        return combinedImagePair;
+    }
+
+    public void FlipGridHorizontal(MapCellData[,] list)
+    {
+        for (int i = 0; i < list.GetLength(0); i++)
         {
-
-            // Initialise start and end index
             int start = 0;
-            int end = mapCells.GetLength(1) / 2 - 1;
-
-            // Till start < end, swap the element
-            // at start and end index
+            int end = list.GetLength(1) - 1;
             while (start < end)
             {
-                // Swap the element
-                MapCellData temp = mapCells[i, start];
-                mapCells[i, start] = mapCells[i, end];
-                mapCells[i, end] = temp;
-
-                // Increment start and decrement
-                // end for next pair of swapping
+                MapCellData temp = list[i, start];
+                list[i, start] = list[i, end];
+                list[i, end] = temp;
                 start++;
                 end--;
             }
@@ -170,10 +273,9 @@ public class GridManager : MonoBehaviour
 
     public MapCellData[,] RotateGrid90(MapCellData[,] oldGrid)
     {
-
         MapCellData[,] newMatrix = new MapCellData[oldGrid.GetLength(1), oldGrid.GetLength(0)];
         int newColumn, newRow = 0;
-        for (int oldColumn = oldGrid.GetLength(1) / 2 - 1; oldColumn >= 0; oldColumn--)
+        for (int oldColumn = oldGrid.GetLength(1) - 1; oldColumn >= 0; oldColumn--)
         {
             newColumn = 0;
             for (int oldRow = 0; oldRow < oldGrid.GetLength(0); oldRow++)
@@ -185,8 +287,6 @@ public class GridManager : MonoBehaviour
         }
         return newMatrix;
     }
-    //!==
-
 
     private void OnDrawGizmos()
     {
@@ -211,7 +311,10 @@ public class GridManager : MonoBehaviour
             });
         }
     }
+
+    //todo report progress from drones
 }
+
 
 public struct MapCellData
 {

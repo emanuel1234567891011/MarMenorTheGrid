@@ -13,6 +13,14 @@ public class Drone : MonoBehaviour
     public float Speed;
     public float Battery;
     public int Capacity;
+    public Color TraversableColor;
+
+    public Color GetTraversableColor => TraversableColor;
+
+    public virtual void Initialize(Color tColor, MapCellData[,] data)
+    {
+
+    }
 
     public virtual void MoveToLocation(Vector3 pos)
     {

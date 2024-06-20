@@ -1,23 +1,49 @@
 using UnityEngine;
-using UnityEngine.Video;
+using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
+using Codice.Client.BaseCommands.BranchExplorer;
+using System;
 
 public class VoronoiUtility : MonoBehaviour
 {
-    public Texture2D CreateDiagram(Vector2Int dimensions, Vector2Int[] centroids)
+    public MeshRenderer testMesh;
+
+    // private void Start()
+    // {
+    //     Vector2Int[] centroids = new Vector2Int[20];
+    //     for (int i = 0; i < 20; i++)
+    //         centroids[i] = new Vector2Int(UnityEngine.Random.Range(0, 100), UnityEngine.Random.Range(0, 100));
+
+    //     testMesh.material.mainTexture = CreateDiagram(new Vector2Int(100, 100), centroids);
+    // }
+
+    public Texture2D CreateDiagram(Color[] regionsC, Vector2Int dimensions, Vector2Int[] centroids)
     {
-        Color[] regionColors = new Color[centroids.Length];
-
-        for (int i = 0; i < centroids.Length; i++)
-            regionColors[i] = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
-
         Color[] pixelColors = new Color[dimensions.x * dimensions.y];
 
         for (int x = 0; x < dimensions.x; x++)
             for (int y = 0; y < dimensions.y; y++)
             {
-                int index = x * dimensions.x + y; //! index is not accounting for non-square textures.
-                pixelColors[index] = regionColors[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
+                int index = x * dimensions.x + y;
+                Color c = regionsC[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
+                pixelColors[index] = c;
             }
+
+        // //! debug
+        // for (int x = 0; x < dimensions.x; x++)
+        //     for (int y = 0; y < dimensions.y; y++)
+        //     {
+        //         int index = x * dimensions.x + y;
+        //         for (int i = 0; i < centroids.Length; i++)
+        //         {
+        //             Vector2Int pos = new Vector2Int(x, y);
+        //             Vector2Int centroidPos = new Vector2Int(centroids[i].x, centroids[i].y);
+        //             if (pos == centroidPos)
+        //                 pixelColors[index] = Color.green;
+        //         }
+        //     }
+        // //!
 
         return GetImageFromColorArray(dimensions, pixelColors);
     }
