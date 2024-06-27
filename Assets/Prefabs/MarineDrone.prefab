@@ -133,7 +133,7 @@ Transform:
   m_GameObject: {fileID: 8743259848824238978}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -24.682365, y: -0.004077886, z: 44.05011}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: Drone # 1
+  StartingCell: {x: 0, y: 0}
   Speed: 1
   Battery: 100
   Capacity: 1000

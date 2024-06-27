@@ -8,31 +8,49 @@ public class MarineDrone : Drone
 {
     public MeshRenderer droneMesh;
     private Seeker seeker;
-    private MapCellData[,] mapData;
     private int totalTraversableCells;
-    private int traversedCells = 0;
+    private int traversedCells = 1;
+    private GridManager gridManager;
+
 
     private void Start()
     {
         seeker = GetComponent<Seeker>();
     }
 
-    //todo drone movement logic
-    //todo choose a direction to move in
-    //todo each movement, check against the data and check the color of that mapcelldata
-
-    public override void Initialize(Color tColor, MapCellData[,] data)
+    private void Update()
     {
-        base.Initialize(tColor, data);
-        droneMesh.material.color = tColor;
-        mapData = data;
+        if (gridManager == null)
+        {
+            gridManager = FindFirstObjectByType<GridManager>();
+            return;
+        }
+
+        if (area.Count == 0)
+            return;
+
+        if (traversedCells < 2)
+        {
+            transform.position = gridManager.GetIndexPosition(area[traversedCells].index);
+            traversedCells++;
+        }
     }
 
-    //todo figure out movement logic.
+    public override void Initialize(Color32 tColor)
+    {
+        base.Initialize(tColor);
+        droneMesh.material.color = tColor;
+    }
 
     public override void MoveToLocation(Vector3 pos)
     {
         base.MoveToLocation(pos);
+    }
+
+    public override void SetTraversableArea(List<TraversableArea> a)
+    {
+        base.SetTraversableArea(a);
+
     }
 
     public override void StopInLocation()

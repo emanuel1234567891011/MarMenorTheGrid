@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using UnityEngine.UI;
+using Unity.VisualScripting;
+using System.Linq;
 
 public class GridManager : MonoBehaviour
 {
@@ -28,6 +31,12 @@ public class GridManager : MonoBehaviour
     public int droneCount = 10;
     private List<MapCellData> droneStartingPoints = new List<MapCellData>();
 
+    private MapCellData[,] vdata;
+
+    //! refactor
+    List<Drone> d1 = new List<Drone>();
+    List<Drone> d2 = new List<Drone>();
+
     void Start()
     {
         loadingBar.Show();
@@ -49,7 +58,7 @@ public class GridManager : MonoBehaviour
 
     private IEnumerator GenerateMap(Texture2D bitMap)
     {
-        loadingBar.UpdateProgress("Converting bitmap to map values...", 1, 5);
+        loadingBar.UpdateProgress("Converting bitmap to map values...", 1, 6);
 
         for (int i = 0; i < mapCells.GetLength(0); i++)
             for (int j = 0; j < mapCells.GetLength(1); j++)
@@ -68,12 +77,12 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
-        loadingBar.UpdateProgress("Creating world bitmap...", 2, 5);
+        loadingBar.UpdateProgress("Creating world bitmap...", 2, 6);
 
         FlipGridHorizontal(mapCells);
 
         //mapCells = RotateGrid90(mapCells);
-        MapCellData[,] vdata = RotateGrid90(mapCells);
+        vdata = RotateGrid90(mapCells);
 
         Color w = Color.white;
         for (int i = 0; i < mapCells.GetLength(0); i++)
@@ -86,7 +95,7 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
-        loadingBar.UpdateProgress("Applying world bitmap to geo...", 3, 5);
+        loadingBar.UpdateProgress("Applying world bitmap to geo...", 3, 6);
 
         Texture2D tex = new Texture2D(bitMap.width, bitMap.height);
         int texIndex = 0;
@@ -109,7 +118,7 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
-        loadingBar.UpdateProgress("Generating drone spawn locations...", 4, 5);
+        loadingBar.UpdateProgress("Generating drone spawn locations...", 4, 6);
 
         int dimensions = Mathf.RoundToInt(Mathf.Sqrt(droneCount));
         Vector2Int[] c1 = new Vector2Int[dimensions * dimensions];
@@ -131,11 +140,12 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        Color[] regionColorsC1 = new Color[c1.Length];
+        Color32[] regionColorsC1 = new Color32[c1.Length];
         for (int i = 0; i < c1.Length; i++)
             regionColorsC1[i] = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 1f);
 
         Array.Resize(ref c1, dronesInWater);
+        Array.Resize(ref regionColorsC1, dronesInWater);
         droneIndex = 0;
 
         for (int i = 0; i < dimensions; i++)
@@ -159,11 +169,12 @@ public class GridManager : MonoBehaviour
             Vector2Int gridPos = new Vector2Int(c1[i].x, c1[i].y);
             Vector3 pos = new Vector3(vdata[gridPos.x, gridPos.y].xPos, 0, vdata[gridPos.x, gridPos.y].zPos);
             MarineDrone d = Instantiate(dronePrefab, pos, Quaternion.identity);
-            d.Initialize(regionColorsC1[i], vdata);
+            d.Initialize(regionColorsC1[i]);
+            d1.Add(d);
             //d.name = $"C1:{i}. X: {gridPos.x}, Y: {gridPos.y}.";
         }
 
-        Vector2Int[] c2 = new Vector2Int[dimensions * dimensions];
+        Vector2Int[] c2 = new Vector2Int[dimensions * dimensions]; //! if index is broken when changing drone count check dim vs region colors
         droneIndex = 0;
         dronesInWater = 0;
         for (int i = 0; i < dimensions; i++)
@@ -181,12 +192,15 @@ public class GridManager : MonoBehaviour
             }
         }
 
+        Color32[] regionColorsC2 = new Color32[c2.Length];
 
-        Color[] regionColorsC2 = new Color[c2.Length];
+
         for (int i = 0; i < c1.Length; i++)
             regionColorsC2[i] = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 1f);
 
         Array.Resize(ref c2, dronesInWater);
+        Array.Resize(ref regionColorsC2, dronesInWater);
+
         droneIndex = 0;
 
         for (int i = 0; i < dimensions; i++)
@@ -210,7 +224,8 @@ public class GridManager : MonoBehaviour
             Vector2Int gridPos = new Vector2Int(c2[i].x, c2[i].y);
             Vector3 pos = new Vector3(vdata[gridPos.x, gridPos.y].xPos, 0, vdata[gridPos.x, gridPos.y].zPos);
             MarineDrone d = Instantiate(dronePrefab, pos, Quaternion.identity);
-            d.Initialize(regionColorsC2[i], vdata);
+            d.Initialize(regionColorsC2[i]);
+            d2.Add(d);
             //d.name = $"C2:{i}. X: {gridPos.x}, Y: {gridPos.y}.";
         }
 
@@ -223,7 +238,7 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
-        loadingBar.UpdateProgress("Combining bitmap with voronoi diagram...", 5, 5);
+        loadingBar.UpdateProgress("Combining bitmap with voronoi diagram...", 5, 6);
 
         //? add this functionality to the voronoi utility itself.
         for (int x = 0; x < voronoiDiagram.width; x++)
@@ -241,7 +256,43 @@ public class GridManager : MonoBehaviour
 
         yield return 0;
 
+        loadingBar.UpdateProgress("Assigning traversable areas...", 6, 6);
+
+        List<List<TraversableArea>> tArea = new List<List<TraversableArea>>();
+        Color32[] allRegions = regionColorsC1.Concat(regionColorsC2).ToArray();
+
+        for (int i = 0; i < allRegions.Length; i++)
+            tArea.Add(new List<TraversableArea>());
+
+        //todo approach # 1
+        //todo ensure the graph indexes line up and add the color value to the map index
+        //todo in the mapcell data 
+
+        //todo approach #2
+        //todo figure out why flipping the graph is necessary and fix that issue so there is no flipping
+        //todo and delete vdata, only use mapcelldatas
+
+        //todo approach #3
+        //todo test to see between the two graphs which one lines up correctly with the voronoi diagram (likely)
+
+        //todo *** approach #4 ***
+        //todo generate a new set of map cells with their own coordinates using the new bitmap rather than using the
+        //todo old mapcell data / bitmap
+
+        //todo try to progress this issue
+
+        // var drones = d1.Union(d2).ToArray();
+        // for (int i = 0; i < drones.Length; i++)
+        //     for (int j = 0; j < tArea.Count; j++)
+        //     {
+        //         //Color co = new Color((int)voronoiDiagram.GetPixel(x, y).r * 255, (int)voronoiDiagram.GetPixel(x, y).g * 255, (int)voronoiDiagram.GetPixel(x, y).b * 255, 255);
+        //         if (drones[i].TraversableColor.Equals(tArea[j].ElementAt(0).color))
+        //             drones[i].SetTraversableArea(tArea[j]);
+        //     }
+
+
         loadingBar.Hide();
+
     }
 
     private Texture2D Combine2Textures(Texture2D _textureA, Texture2D _textureB)
@@ -269,6 +320,15 @@ public class GridManager : MonoBehaviour
                 end--;
             }
         }
+    }
+
+    //todo Drone movement seems to be working but the coordinate system between the diagram and the drones is incorrect.
+    //todo likely a rotational issue between the map and the vdata.
+
+    public Vector3 GetIndexPosition(Vector2Int coords)
+    {
+        Vector3 pos = new Vector3(mapCells[coords.x, coords.y].xPos, 0, mapCells[coords.x, coords.y].zPos);
+        return pos;
     }
 
     public MapCellData[,] RotateGrid90(MapCellData[,] oldGrid)
@@ -312,7 +372,6 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    //todo report progress from drones
 }
 
 
