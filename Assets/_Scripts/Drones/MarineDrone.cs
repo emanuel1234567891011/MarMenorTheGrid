@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using Pathfinding;
 using UnityEngine;
 
@@ -9,16 +8,16 @@ public class MarineDrone : Drone
     public MeshRenderer droneMesh;
     private Seeker seeker;
     private int totalTraversableCells;
-    private int traversedCells = 1;
+    private int traversedCells = 0;
     private GridManager gridManager;
-
+    private DroneManager droneManager;
 
     private void Start()
     {
         seeker = GetComponent<Seeker>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (gridManager == null)
         {
@@ -26,15 +25,26 @@ public class MarineDrone : Drone
             return;
         }
 
-        if (area.Count == 0)
+        if (TraversableCells.Count == 0)
             return;
 
-        if (traversedCells < 2)
+        if (GameManager.Instance.Playing && traversedCells < TraversableCells.Count)
         {
-            transform.position = gridManager.GetIndexPosition(area[traversedCells].index);
+            Vector2Int coords = new Vector2Int(TraversableCells[traversedCells].xIndex, TraversableCells[traversedCells].yIndex);
+            transform.position = gridManager.GetIndexPosition(coords);
             traversedCells++;
+
+            if (droneManager == null)
+                droneManager = FindAnyObjectByType<DroneManager>();
+
+            droneManager.SpaceCleared();
         }
     }
+
+    //todo given a list of coordinates (left to right, top to bottom) how can we process these coordinates and move the drone logically
+    //todo and realistically over the traversable area?
+
+    //todo consider figuring out how to pass in a 2d grid rather than a list? reconstruct 2d grid from list? order list?
 
     public override void Initialize(Color32 tColor)
     {
@@ -47,9 +57,9 @@ public class MarineDrone : Drone
         base.MoveToLocation(pos);
     }
 
-    public override void SetTraversableArea(List<TraversableArea> a)
+    public override void SetTraversableCells(List<MapCellData> a)
     {
-        base.SetTraversableArea(a);
+        base.SetTraversableCells(a);
 
     }
 
@@ -62,4 +72,17 @@ public class MarineDrone : Drone
     {
         return traversedCells / totalTraversableCells;
     }
+
+    // void OnDrawGizmos()
+    // {
+    //     Gizmos.color = TraversableColor;
+
+    //     if (TraversableCells.Count == 0)
+    //         return;
+
+    //     for (int i = 0; i < TraversableCells.Count; i++)
+    //     {
+    //         Gizmos.DrawWireCube(new Vector3(TraversableCells[i].xPos, 0, TraversableCells[i].zPos), new Vector3(.1f, .1f, .1f));
+    //     }
+    // }
 }

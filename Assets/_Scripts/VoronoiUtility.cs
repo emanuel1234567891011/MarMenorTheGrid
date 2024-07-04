@@ -48,15 +48,3 @@ public class VoronoiUtility : MonoBehaviour
         return tex;
     }
 }
-
-public struct TraversableArea
-{
-    public TraversableArea(Vector2Int i, Color32 c)
-    {
-        index = i;
-        color = c;
-    }
-
-    public Vector2Int index;
-    public Color32 color;
-}

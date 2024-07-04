@@ -5,6 +5,7 @@ using System;
 using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Linq;
+using TMPro;
 
 public class GridManager : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class GridManager : MonoBehaviour
     [Header("References")]
     public VoronoiUtility voronoiUtility;
     public LoadingBar loadingBar;
+    public DroneHUDController droneHUD;
+    public TMP_InputField droneCountInput;
+
+    int traversableAreaCount;
 
     [Header("Map Data")]
     public MeshRenderer quad;
@@ -21,14 +26,12 @@ public class GridManager : MonoBehaviour
     [Header("Game Grid")]
     public int gridXLength = 10;
     private MapCellData[,] mapCells = { };
-    private List<MapCellData> borderCells = new List<MapCellData>();
+    private List<List<MapCellData>> traversableAreas = new List<List<MapCellData>>();
     private float ar;
     private float gs;
     private Vector3 offsetPos;
-    private float startTime;
 
     [Header("Drones")]
-    public int droneCount = 10;
     private List<MapCellData> droneStartingPoints = new List<MapCellData>();
 
     private MapCellData[,] vdata;
@@ -37,11 +40,12 @@ public class GridManager : MonoBehaviour
     List<Drone> d1 = new List<Drone>();
     List<Drone> d2 = new List<Drone>();
 
-    void Start()
+    public event Action OnMapGenerationComplete = delegate { };
+
+
+    public void Init()
     {
         loadingBar.Show();
-
-        startTime = Time.time;
 
         mapCells = new MapCellData[bitMap.width, bitMap.height];
 
@@ -84,17 +88,6 @@ public class GridManager : MonoBehaviour
         //mapCells = RotateGrid90(mapCells);
         vdata = RotateGrid90(mapCells);
 
-        Color w = Color.white;
-        for (int i = 0; i < mapCells.GetLength(0); i++)
-            for (int j = 0; j < mapCells.GetLength(1); j++)
-            {
-                w = new Color(Mathf.RoundToInt(bitMap.GetPixel(i, j).r), Mathf.RoundToInt(bitMap.GetPixel(i, j).g), Mathf.RoundToInt(bitMap.GetPixel(i, j).b), 1);
-                if (w == Color.black)
-                    borderCells.Add(mapCells[i, j]);
-            }
-
-        yield return 0;
-
         loadingBar.UpdateProgress("Applying world bitmap to geo...", 3, 6);
 
         Texture2D tex = new Texture2D(bitMap.width, bitMap.height);
@@ -120,7 +113,8 @@ public class GridManager : MonoBehaviour
 
         loadingBar.UpdateProgress("Generating drone spawn locations...", 4, 6);
 
-        int dimensions = Mathf.RoundToInt(Mathf.Sqrt(droneCount));
+        Debug.Log(int.Parse(droneCountInput.text));
+        int dimensions = Mathf.RoundToInt(Mathf.Sqrt(int.Parse(droneCountInput.text)));
         Vector2Int[] c1 = new Vector2Int[dimensions * dimensions];
         int xDim = bitMap.width / dimensions;
         int droneIndex = 0;
@@ -258,42 +252,49 @@ public class GridManager : MonoBehaviour
 
         loadingBar.UpdateProgress("Assigning traversable areas...", 6, 6);
 
-        List<List<TraversableArea>> tArea = new List<List<TraversableArea>>();
-        Color32[] allRegions = regionColorsC1.Concat(regionColorsC2).ToArray();
+        Color32[] allRegions = regionColorsC1.Union(regionColorsC2).ToArray();
 
-        for (int i = 0; i < allRegions.Length; i++)
-            tArea.Add(new List<TraversableArea>());
+        for (int lists = 0; lists < allRegions.Length; lists++)
+        {
+            MapCellData temp = new MapCellData(0, 0, 0, 0, false, false, allRegions[lists]);
+            traversableAreas.Add(new List<MapCellData>());
+        }
 
-        //todo approach # 1
-        //todo ensure the graph indexes line up and add the color value to the map index
-        //todo in the mapcell data 
+        for (int x = 0; x < voronoiDiagram.width; x++)
+        {
+            for (int y = 0; y < voronoiDiagram.height; y++)
+            {
+                mapCells[x, y].xIndex = x;
+                mapCells[x, y].yIndex = y;
+                mapCells[x, y].xPos = offsetPos.x * 2 + x * gs + gs / 2;
+                mapCells[x, y].zPos = offsetPos.y * 2 + y * gs + gs / 2;
+                mapCells[x, y].color = voronoiDiagram.GetPixel(x, y);
+                for (int ta = 0; ta < allRegions.Length; ta++)
+                    if (allRegions[ta] == voronoiDiagram.GetPixel(x, y))
+                        traversableAreas[ta].Add(mapCells[x, y]);
+            }
+        }
 
-        //todo approach #2
-        //todo figure out why flipping the graph is necessary and fix that issue so there is no flipping
-        //todo and delete vdata, only use mapcelldatas
+        var allDrones = d1.Union(d2).ToList();
 
-        //todo approach #3
-        //todo test to see between the two graphs which one lines up correctly with the voronoi diagram (likely)
+        for (int i = 0; i < allDrones.Count; i++)
+        {
+            for (int j = 0; j < traversableAreas.Count; j++)
+            {
+                if (allDrones[i].TraversableColor.Equals(traversableAreas[i].ElementAt(0).color))
+                    allDrones[i].SetTraversableCells(traversableAreas[i]);
+            }
+        }
 
-        //todo *** approach #4 ***
-        //todo generate a new set of map cells with their own coordinates using the new bitmap rather than using the
-        //todo old mapcell data / bitmap
-
-        //todo try to progress this issue
-
-        // var drones = d1.Union(d2).ToArray();
-        // for (int i = 0; i < drones.Length; i++)
-        //     for (int j = 0; j < tArea.Count; j++)
-        //     {
-        //         //Color co = new Color((int)voronoiDiagram.GetPixel(x, y).r * 255, (int)voronoiDiagram.GetPixel(x, y).g * 255, (int)voronoiDiagram.GetPixel(x, y).b * 255, 255);
-        //         if (drones[i].TraversableColor.Equals(tArea[j].ElementAt(0).color))
-        //             drones[i].SetTraversableArea(tArea[j]);
-        //     }
-
+        yield return 0;
 
         loadingBar.Hide();
-
+        droneHUD.gameObject.SetActive(true);
+        traversableAreaCount = traversableAreas.SelectMany(list => list).Distinct().Count();
+        OnMapGenerationComplete();
     }
+
+    public int GetTraversableAreaCount => traversableAreaCount;
 
     private Texture2D Combine2Textures(Texture2D _textureA, Texture2D _textureB)
     {
@@ -304,6 +305,8 @@ public class GridManager : MonoBehaviour
         combinedImagePair.Apply();
         return combinedImagePair;
     }
+
+    public List<Drone> GetDrones => d1.Union(d2).ToList();
 
     public void FlipGridHorizontal(MapCellData[,] list)
     {
@@ -321,9 +324,6 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-
-    //todo Drone movement seems to be working but the coordinate system between the diagram and the drones is incorrect.
-    //todo likely a rotational issue between the map and the vdata.
 
     public Vector3 GetIndexPosition(Vector2Int coords)
     {
@@ -350,16 +350,6 @@ public class GridManager : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
-
-        if (borderCells.Count > 0)
-        {
-            borderCells.ForEach(x =>
-            {
-                Gizmos.DrawWireCube(new Vector3(x.xPos, 0, x.zPos), new Vector3(gs, gs, gs));
-            });
-        }
-
         Gizmos.color = Color.magenta;
 
         if (droneStartingPoints.Count > 0)
@@ -377,7 +367,7 @@ public class GridManager : MonoBehaviour
 
 public struct MapCellData
 {
-    public MapCellData(int xI, int yI, float x, float z, bool water, bool borderPosition)
+    public MapCellData(int xI, int yI, float x, float z, bool water, bool borderPosition, Color c)
     {
         xIndex = xI;
         yIndex = yI;
@@ -385,6 +375,7 @@ public struct MapCellData
         zPos = z;
         isWater = water;
         isBorder = borderPosition;
+        color = c;
     }
 
     public int xIndex;
@@ -393,4 +384,17 @@ public struct MapCellData
     public float zPos;
     public bool isWater;
     public bool isBorder;
+    public Color32 color;
+}
+
+public struct TraversableArea
+{
+    public TraversableArea(Vector2Int i, Color32 c)
+    {
+        index = i;
+        color = c;
+    }
+
+    public Vector2Int index;
+    public Color32 color;
 }

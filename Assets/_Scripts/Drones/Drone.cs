@@ -11,23 +11,39 @@ public class Drone : MonoBehaviour
     //unique functionality to the derived classes. (Marine, Air)
 
     public string Name;
-    public Vector2Int StartingCell;
     public float Speed;
     public float Battery;
     public int Capacity;
     public Color32 TraversableColor;
+    public List<MapCellData> TraversableCells = new List<MapCellData>();
+    private DroneManager droneManager;
 
-    public Color32 GetTraversableColor => TraversableColor;
-    public List<TraversableArea> area = new List<TraversableArea>();
+    private void Start()
+    {
+        // Name = "Drone " + Random.Range(0, 1000).ToString();
+        // Speed = Random.Range(0, 1000);
+        // Battery = Random.Range(0, 100);
+        // Capacity = Random.Range(0, 100);
+    }
 
     public virtual void Initialize(Color32 tColor)
     {
+        // Name = "Drone " + Random.Range(0, 1000).ToString();
+        // Speed = Random.Range(0, 1000);
+        // Battery = Random.Range(0, 100);
+        // Capacity = Random.Range(0, 100);
+
         TraversableColor = tColor;
     }
 
-    public virtual void SetTraversableArea(List<TraversableArea> a)
+    public virtual void SetTraversableCells(List<MapCellData> a)
     {
-        area = a;
+        TraversableCells = a;
+        if (droneManager == null)
+            droneManager = FindAnyObjectByType<DroneManager>();
+
+        droneManager.SpaceCleared();
+
     }
 
     public virtual void MoveToLocation(Vector3 pos)
@@ -40,3 +56,5 @@ public class Drone : MonoBehaviour
 
     }
 }
+
+
