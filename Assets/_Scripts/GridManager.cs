@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Linq;
 using TMPro;
+using System.Security.Cryptography;
 
 public class GridManager : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class GridManager : MonoBehaviour
     [Header("Map Data")]
     public MeshRenderer quad;
     public Texture2D bitMap;
+    public int heightInKM = 16;
+    public int widthInKM = 9;
 
     [Header("Game Grid")]
     public int gridXLength = 10;
@@ -30,6 +33,8 @@ public class GridManager : MonoBehaviour
     private float ar;
     private float gs;
     private Vector3 offsetPos;
+    private Texture2D voronoiDiagram;
+    public Color cleanedColor;
 
     [Header("Drones")]
     private List<MapCellData> droneStartingPoints = new List<MapCellData>();
@@ -42,6 +47,10 @@ public class GridManager : MonoBehaviour
 
     public event Action OnMapGenerationComplete = delegate { };
 
+    private void Start()
+    {
+        droneCountInput.text = "5";
+    }
 
     public void Init()
     {
@@ -113,8 +122,13 @@ public class GridManager : MonoBehaviour
 
         loadingBar.UpdateProgress("Generating drone spawn locations...", 4, 6);
 
-        Debug.Log(int.Parse(droneCountInput.text));
-        int dimensions = Mathf.RoundToInt(Mathf.Sqrt(int.Parse(droneCountInput.text)));
+        int dCount = int.Parse(droneCountInput.text);
+        if (dCount % 2 > 0)
+            dCount += 1;
+
+        int dimensions = dCount / 2;
+
+
         Vector2Int[] c1 = new Vector2Int[dimensions * dimensions];
         int xDim = bitMap.width / dimensions;
         int droneIndex = 0;
@@ -226,7 +240,7 @@ public class GridManager : MonoBehaviour
         for (int i = 0; i < c2.Length; i++)
             c2[i].x -= 1024;
 
-        Texture2D voronoiDiagram = Combine2Textures(voronoiUtility.CreateDiagram(regionColorsC1, new Vector2Int(bitMap.width, bitMap.height / 2),
+        voronoiDiagram = Combine2Textures(voronoiUtility.CreateDiagram(regionColorsC1, new Vector2Int(bitMap.width, bitMap.height / 2),
             c1), voronoiUtility.CreateDiagram(regionColorsC2, new Vector2Int(bitMap.width, bitMap.height / 2), c2));
         quad.material.mainTexture = voronoiDiagram;
 
@@ -294,6 +308,14 @@ public class GridManager : MonoBehaviour
         OnMapGenerationComplete();
     }
 
+    public float GetCellSizeInMeters()
+    {
+        int cells = mapCells.GetLength(0);
+        float cellsPerKM = cells / widthInKM;
+        float cellSize = cellsPerKM / 1000;
+        return cellSize;
+    }
+
     public int GetTraversableAreaCount => traversableAreaCount;
 
     private Texture2D Combine2Textures(Texture2D _textureA, Texture2D _textureB)
@@ -325,9 +347,22 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (updateTexture)
+        {
+            voronoiDiagram.Apply();
+            updateTexture = false;
+        }
+    }
+
+    bool updateTexture;
+
     public Vector3 GetIndexPosition(Vector2Int coords)
     {
         Vector3 pos = new Vector3(mapCells[coords.x, coords.y].xPos, 0, mapCells[coords.x, coords.y].zPos);
+        voronoiDiagram.SetPixel(coords.x, coords.y, cleanedColor);
+        updateTexture = true;
         return pos;
     }
 

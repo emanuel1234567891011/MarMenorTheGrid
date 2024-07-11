@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
+
     public float timeScale = 1;
 
     public bool Playing;

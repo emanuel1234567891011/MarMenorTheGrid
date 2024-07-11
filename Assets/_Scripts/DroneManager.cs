@@ -5,9 +5,11 @@ using TMPro;
 using System;
 using UnityEngine.UI;
 using Unity.Mathematics;
+using NUnit.Framework.Constraints;
 
 public class DroneManager : MonoBehaviour
 {
+    public DroneCharger ChargerPrefab;
     public TMP_InputField NameText;
     public TMP_InputField BatteryText;
     public TMP_InputField CapacityText;
@@ -16,6 +18,7 @@ public class DroneManager : MonoBehaviour
 
     public GridManager gridManager;
     public List<Drone> drones = new List<Drone>();
+    private List<DroneCharger> chargers = new List<DroneCharger>();
 
     int clearedSpaces = 0;
 
@@ -26,13 +29,16 @@ public class DroneManager : MonoBehaviour
         {
             float pctComplete = (float)clearedSpaces / (float)gridManager.GetTraversableAreaCount;
             SpaceClearedText.text = "Area cleared: " + (float)Math.Round(pctComplete, 4) + "%";
-            Debug.Log(pctComplete + " " + Math.Round(pctComplete, 2));
-
         }
     }
 
     private void Start()
     {
+        NameText.text = "asdas";
+        BatteryText.text = "10";
+        CapacityText.text = "100";
+        SpeedText.text = "100";
+
         gridManager.OnMapGenerationComplete += InitializeDrones;
     }
 
@@ -45,6 +51,9 @@ public class DroneManager : MonoBehaviour
             x.Battery = float.Parse(BatteryText.text);
             x.Capacity = int.Parse(CapacityText.text);
             x.Speed = float.Parse(SpeedText.text);
+            var c = Instantiate(ChargerPrefab, x.transform.position, Quaternion.identity);
+            chargers.Add(c);
+            x.Charger = c;
         });
     }
 

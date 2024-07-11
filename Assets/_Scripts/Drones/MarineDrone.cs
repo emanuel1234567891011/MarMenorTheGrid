@@ -1,20 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
-using Pathfinding;
+using System.Linq;
 using UnityEngine;
+using DG.Tweening;
 
 public class MarineDrone : Drone
 {
     public MeshRenderer droneMesh;
-    private Seeker seeker;
     private int totalTraversableCells;
     private int traversedCells = 0;
     private GridManager gridManager;
     private DroneManager droneManager;
+    public bool debug;
+    private bool gridConstructed;
+    private List<List<MapCellData>> traversableGrid = new List<List<MapCellData>>();
+    private int gridIndex = 0;
+    private int gridPositionIndex = 0;
+    private bool charging;
+    private float startingBattery;
 
     private void Start()
     {
-        seeker = GetComponent<Seeker>();
+        startingBattery = Battery;
     }
 
     private void FixedUpdate()
@@ -25,14 +32,37 @@ public class MarineDrone : Drone
             return;
         }
 
-        if (TraversableCells.Count == 0)
+        if (charging || TraversableCells.Count == 0)
             return;
+
+        if (TraversableCells.Count > 0 && gridConstructed == false)
+            ContsructGrid();
+
 
         if (GameManager.Instance.Playing && traversedCells < TraversableCells.Count)
         {
-            Vector2Int coords = new Vector2Int(TraversableCells[traversedCells].xIndex, TraversableCells[traversedCells].yIndex);
+            if (debug)
+                Debug.Log(gridPositionIndex + " " + traversableGrid[gridIndex].Count);
+
+            MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
+            Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
             transform.position = gridManager.GetIndexPosition(coords);
             traversedCells++;
+
+            if (gridPositionIndex + 1 > traversableGrid[gridIndex].Count - 1)
+            {
+                gridIndex++;
+                gridPositionIndex = 0;
+            }
+            else
+            {
+                gridPositionIndex++;
+            }
+
+            Battery -= Time.deltaTime;
+
+            if (Battery < 0)
+                StartCoroutine(Recharge());
 
             if (droneManager == null)
                 droneManager = FindAnyObjectByType<DroneManager>();
@@ -41,21 +71,37 @@ public class MarineDrone : Drone
         }
     }
 
-    //todo given a list of coordinates (left to right, top to bottom) how can we process these coordinates and move the drone logically
-    //todo and realistically over the traversable area?
-
-    //todo consider figuring out how to pass in a 2d grid rather than a list? reconstruct 2d grid from list? order list?
-
     public override void Initialize(Color32 tColor)
     {
         base.Initialize(tColor);
         droneMesh.material.color = tColor;
     }
 
-    public override void MoveToLocation(Vector3 pos)
+    void ContsructGrid()
     {
-        base.MoveToLocation(pos);
+        gridConstructed = true;
+        int index = TraversableCells[0].xIndex;
+        int gridIndex = 0;
+        traversableGrid.Add(new List<MapCellData>());
+        for (int i = 0; i < TraversableCells.Count; i++)
+        {
+            if (TraversableCells[i].xIndex == index)
+            {
+                traversableGrid[gridIndex].Add(TraversableCells[i]);
+            }
+            else
+            {
+                index++;
+                traversableGrid.Add(new List<MapCellData>());
+                gridIndex++;
+            }
+        }
+
+        for (int i = 0; i < traversableGrid.Count; i++)
+            if (i % 2 > 0)
+                traversableGrid[i].Reverse();
     }
+
 
     public override void SetTraversableCells(List<MapCellData> a)
     {
@@ -63,14 +109,26 @@ public class MarineDrone : Drone
 
     }
 
-    public override void StopInLocation()
-    {
-        base.StopInLocation();
-    }
-
     private float CoverageProgress()
     {
         return traversedCells / totalTraversableCells;
+    }
+
+    private IEnumerator Recharge()
+    {
+        charging = true;
+        float distance = Vector3.Distance(transform.position, Charger.transform.position);
+        droneMesh.transform.DOMove(Charger.transform.position, distance);
+        yield return new WaitForSeconds(distance);
+        Charger.Charge(ChargeDuration);
+        yield return new WaitForSeconds(ChargeDuration);
+        Battery = startingBattery;
+        MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
+        Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
+        droneMesh.transform.DOMove(gridManager.GetIndexPosition(coords), distance);
+        yield return new WaitForSeconds(distance + .25f);
+        droneMesh.transform.position = transform.position;
+        charging = false;
     }
 
     // void OnDrawGizmos()

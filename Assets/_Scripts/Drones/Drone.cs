@@ -12,11 +12,12 @@ public class Drone : MonoBehaviour
 
     public string Name;
     public float Speed;
+    public float ChargeDuration = 10;
     public float Battery;
     public int Capacity;
     public Color32 TraversableColor;
     public List<MapCellData> TraversableCells = new List<MapCellData>();
-    private DroneManager droneManager;
+    public DroneCharger Charger;
 
     private void Start()
     {
@@ -39,21 +40,6 @@ public class Drone : MonoBehaviour
     public virtual void SetTraversableCells(List<MapCellData> a)
     {
         TraversableCells = a;
-        if (droneManager == null)
-            droneManager = FindAnyObjectByType<DroneManager>();
-
-        droneManager.SpaceCleared();
-
-    }
-
-    public virtual void MoveToLocation(Vector3 pos)
-    {
-
-    }
-
-    public virtual void StopInLocation()
-    {
-
     }
 }
 
