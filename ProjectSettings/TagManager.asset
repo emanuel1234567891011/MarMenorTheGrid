@@ -6,11 +6,12 @@ TagManager:
   tags:
   - DetectableCube
   - PlasticBottle
+  - map
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - UIMAP
   - Water
   - UI
   - 

@@ -18,13 +18,16 @@ public class MarineDrone : Drone
     private int gridPositionIndex = 0;
     private bool charging;
     private float startingBattery;
+    private float movementDelay = 0;
+    private float currentMovementDelay;
 
     private void Start()
     {
         startingBattery = Battery;
+        droneManager = FindAnyObjectByType<DroneManager>();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (gridManager == null)
         {
@@ -38,36 +41,38 @@ public class MarineDrone : Drone
         if (TraversableCells.Count > 0 && gridConstructed == false)
             ContsructGrid();
 
-
         if (GameManager.Instance.Playing && traversedCells < TraversableCells.Count)
         {
-            if (debug)
-                Debug.Log(gridPositionIndex + " " + traversableGrid[gridIndex].Count);
+            currentMovementDelay += Time.deltaTime;
+            movementDelay = 1 / droneManager.metersPS;
 
-            MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
-            Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
-            transform.position = gridManager.GetIndexPosition(coords);
-            traversedCells++;
-
-            if (gridPositionIndex + 1 > traversableGrid[gridIndex].Count - 1)
+            if (currentMovementDelay > movementDelay)
             {
-                gridIndex++;
-                gridPositionIndex = 0;
+                MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
+                Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
+                transform.position = gridManager.GetIndexPosition(coords);
+                traversedCells++;
+
+                if (gridPositionIndex + 1 > traversableGrid[gridIndex].Count - 1)
+                {
+                    gridIndex++;
+                    gridPositionIndex = 0;
+                }
+                else
+                    gridPositionIndex++;
+
+
+                Battery -= Time.deltaTime;
+
+                if (Battery < 0)
+                    StartCoroutine(Recharge());
+
+                droneManager.SpaceCleared();
+
+                currentMovementDelay = 0;
             }
             else
-            {
-                gridPositionIndex++;
-            }
-
-            Battery -= Time.deltaTime;
-
-            if (Battery < 0)
-                StartCoroutine(Recharge());
-
-            if (droneManager == null)
-                droneManager = FindAnyObjectByType<DroneManager>();
-
-            droneManager.SpaceCleared();
+                return;
         }
     }
 
@@ -75,6 +80,12 @@ public class MarineDrone : Drone
     {
         base.Initialize(tColor);
         droneMesh.material.color = tColor;
+    }
+
+    public float GetSpeed(float time, int tCells)
+    {
+        float speed = gridManager.GetCellSizeInMeters() * traversedCells / time;
+        return speed;
     }
 
     void ContsructGrid()
