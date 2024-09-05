@@ -6,7 +6,28 @@ using UnityEngine.UI;
 public class UserInput : MonoBehaviour
 {
     [SerializeField] DroneHUDController hud;
+    [SerializeField] Color _selectedColor;
+    [SerializeField] Button _placeDronesButton;
+    [SerializeField] Button _placeChargerButton;
+
     private Drone currentDrone = null;
+
+    void Start()
+    {
+        PlaceDronesButtonPressed();
+    }
+
+    public void PlaceDronesButtonPressed()
+    {
+        _placeChargerButton.GetComponent<Image>().color = Color.white;
+        _placeDronesButton.GetComponent<Image>().color = _selectedColor;
+    }
+
+    public void PlaceChargersButtonPressed()
+    {
+        _placeChargerButton.GetComponent<Image>().color = _selectedColor;
+        _placeDronesButton.GetComponent<Image>().color = Color.white;
+    }
 
     void Update()
     {
@@ -30,9 +51,7 @@ public class UserInput : MonoBehaviour
                     pixelUV.y *= tex.height;
 
                     if (tex.GetPixel((int)pixelUV.x, (int)pixelUV.y) == Color.blue)
-                    {
-                        FindAnyObjectByType<GridManager>().SpawnDebugCubeAtLocation(new Vector2Int((int)pixelUV.x, (int)pixelUV.y));
-                    }
+                        FindAnyObjectByType<GridManager>().MapInteracted(new Vector2Int((int)pixelUV.x, (int)pixelUV.y), hit.point);
                 }
                 else
                 {

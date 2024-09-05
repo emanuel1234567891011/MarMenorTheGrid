@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using TMPro;
-using System.Security.Cryptography;
-using System.Net.WebSockets;
-using System.Net;
 
 public class GridManager : MonoBehaviour
 {
     public MarineDrone dronePrefab;
 
     [Header("References")]
+    public GameObject droneIcon;
+    public GameObject chargerIcon;
     public MapData mapData;
     public Material overlayMaterial;
     public MeshRenderer inputMap;
@@ -47,7 +46,10 @@ public class GridManager : MonoBehaviour
     private List<Vector2Int> centroids = new List<Vector2Int>();
     private List<Drone> drones = new List<Drone>();
 
-    public event Action OnMapGenerationComplete = delegate { };
+    public event Action<List<Vector2Int>> OnMapGenerationComplete = delegate { };
+    private bool placingDrones = true;
+    private bool placingChargers;
+    private List<Vector2Int> chargerLocations = new List<Vector2Int>();
 
     private void Start()
     {
@@ -184,12 +186,17 @@ public class GridManager : MonoBehaviour
 
         droneHUD.gameObject.SetActive(true);
         traversableAreaCount = traversableAreas.SelectMany(list => list).Distinct().Count();
-        OnMapGenerationComplete();
+        var icons = FindObjectsByType<UIMapIcon>(FindObjectsSortMode.None).ToList();
+        icons.ForEach(x => Destroy(x.gameObject));
+        OnMapGenerationComplete(chargerLocations);
     }
 
     private void AddCoordinatesToDroneList(Vector2Int v)
     {
-        centroids.Add(v);
+        if (placingDrones)
+            centroids.Add(v);
+        else if (placingChargers)
+            chargerLocations.Add(v);
     }
 
     public float GetCellSizeInMeters()
@@ -218,19 +225,46 @@ public class GridManager : MonoBehaviour
 
     bool updateTexture;
 
+    public void MapInteracted(Vector2Int coord, Vector3 worldSpace)
+    {
+        AddCoordinatesToDroneList(coord);
+
+        if (placingDrones)
+        {
+            Instantiate(droneIcon, worldSpace, Quaternion.identity);
+            Debug.Log("instance drone icon");
+        }
+        else if (placingChargers)
+        {
+            Instantiate(chargerIcon, worldSpace, Quaternion.identity);
+        }
+    }
+
     public Vector3 GetIndexPosition(Vector2Int coords)
     {
         Vector3 pos = new Vector3(mapCells[coords.x, coords.y].xPos, 0, mapCells[coords.x, coords.y].zPos);
         if (voronoiDiagram != null)
             voronoiDiagram.SetPixel(coords.x, coords.y, cleanedColor);
         updateTexture = true;
-        AddCoordinatesToDroneList(coords);
         return pos;
     }
 
-    public void SpawnDebugCubeAtLocation(Vector2Int coord)
+    public Vector3 GetChargerPosition(Vector2Int coords)
     {
-        Instantiate(dronePrefab, GetIndexPosition(coord), Quaternion.identity);
+        Vector3 pos = new Vector3(mapCells[coords.x, coords.y].xPos, 0, mapCells[coords.x, coords.y].zPos);
+        return pos;
+    }
+
+    public void PlacingDrones()
+    {
+        placingChargers = false;
+        placingDrones = true;
+    }
+
+    public void PlacingChargers()
+    {
+        placingChargers = true;
+        placingDrones = false;
     }
 }
 

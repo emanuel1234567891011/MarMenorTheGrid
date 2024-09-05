@@ -46,7 +46,7 @@ public class DroneManager : MonoBehaviour
         gridManager.OnMapGenerationComplete += InitializeDrones;
     }
 
-    private void InitializeDrones()
+    private void InitializeDrones(List<Vector2Int> chargerLocations)
     {
         drones = gridManager.GetDrones;
         drones.ForEach(x =>
@@ -55,11 +55,12 @@ public class DroneManager : MonoBehaviour
             x.Battery = float.Parse(BatteryText.text);
             x.Capacity = int.Parse(CapacityText.text);
             x.Speed = float.Parse(SpeedText.text);
-            var c = Instantiate(ChargerPrefab, x.transform.position, Quaternion.identity);
-            chargers.Add(c);
-            x.Charger = c;
         });
-    }
 
-    //todo transfer logic from grid manager after it's working.
+        for (int i = 0; i < chargerLocations.Count; i++)
+        {
+            DroneCharger dc = Instantiate(ChargerPrefab, gridManager.GetChargerPosition(chargerLocations[i]), Quaternion.identity);
+            chargers.Add(dc);
+        }
+    }
 }

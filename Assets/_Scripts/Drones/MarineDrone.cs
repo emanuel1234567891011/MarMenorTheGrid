@@ -35,6 +35,7 @@ public class MarineDrone : Drone
             return;
         }
 
+
         if (charging || TraversableCells.Count == 0)
             return;
 
@@ -74,6 +75,24 @@ public class MarineDrone : Drone
             else
                 return;
         }
+    }
+
+    public DroneCharger FindCharger()
+    {
+        var chargers = FindObjectsByType<DroneCharger>(FindObjectsSortMode.None);
+        float max = Mathf.Infinity;
+        DroneCharger current = null;
+        foreach (var dc in chargers)
+        {
+            float dist = Vector3.Distance(transform.position, dc.transform.position);
+            if (dist < max)
+            {
+                max = dist;
+                current = dc;
+            }
+        }
+
+        return current;
     }
 
     public override void Initialize(Color32 tColor)
@@ -127,6 +146,8 @@ public class MarineDrone : Drone
 
     private IEnumerator Recharge()
     {
+        Charger = FindCharger();
+
         charging = true;
         float distance = Vector3.Distance(transform.position, Charger.transform.position);
         droneMesh.transform.DOMove(Charger.transform.position, distance);
