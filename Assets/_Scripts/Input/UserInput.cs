@@ -42,6 +42,12 @@ public class UserInput : MonoBehaviour
                 {
                     currentDrone = hit.collider.GetComponent<Drone>();
                 }
+
+                if (hit.collider.GetComponent<UIMapIcon>() != null)
+                {
+                    Debug.Log("hit icon");
+                    return;
+                }
                 else if (hit.collider.tag == "map")
                 {
                     Renderer rend = hit.transform.GetComponent<Renderer>();
@@ -62,7 +68,7 @@ public class UserInput : MonoBehaviour
         }
 
         if (currentDrone)
-            hud.PopulateDroneInfo(currentDrone.Name, currentDrone.Capacity, currentDrone.Battery, currentDrone.Speed);
+            hud.PopulateDroneInfo(currentDrone.Name, currentDrone.Capacity, currentDrone.Battery, currentDrone.Velocity);
     }
 
 }

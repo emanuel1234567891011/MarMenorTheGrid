@@ -6,7 +6,7 @@ public static class CSVManager
     static string reportDirectoryName = "Reports";
     static string reportFileName = "report.csv";
     static string reportSeperator = ",";
-    static string[] reportHeaders = new string[] { "Drone Numer", "Cells Cleaned", "Energy Required" };
+    static string[] reportHeaders = new string[] { "Drone Number", "Battery Capacity", "Velocity", "Waste Capacity", "Charge Speed", "Cost of Electricity" };
 
     #region Actions
 

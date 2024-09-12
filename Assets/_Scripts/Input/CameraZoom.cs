@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraZoom : MonoBehaviour
 {
@@ -17,11 +18,14 @@ public class CameraZoom : MonoBehaviour
 
     void Update()
     {
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        if (scrollInput > 0)
-            UpdateFov(cam.fieldOfView - 1);
-        else if (scrollInput < 0)
-            UpdateFov(cam.fieldOfView + 1);
+        if (EventSystem.current.currentSelectedGameObject == null)
+        {
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+            if (scrollInput > 0)
+                UpdateFov(cam.fieldOfView - 1);
+            else if (scrollInput < 0)
+                UpdateFov(cam.fieldOfView + 1);
+        }
     }
 
     void UpdateFov(float newFov)

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d11c1d224894cedaf05cd9d24ca729, type: 3}
   m_Name: SOG
   m_EditorClassIdentifier: 
-  bitmap: {fileID: 2800000, guid: ffbf79a712b4126539256bf48f6861a3, type: 3}
-  overlayMap: {fileID: 2800000, guid: eede6d9875d10b9d6b4a1dfcdfa79dd9, type: 3}
+  bitmap: {fileID: 2800000, guid: bb2c5339e14a48630acb36b1425ea521, type: 3}
+  overlayMap: {fileID: 2800000, guid: ecdd74f2c6820fc3ea3167a3182a0cff, type: 3}

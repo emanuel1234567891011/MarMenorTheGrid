@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class MarineDrone : Drone
 {
     public MeshRenderer droneMesh;
+    public LineRenderer chargeLine;
     private int totalTraversableCells;
     private int traversedCells = 0;
     private GridManager gridManager;
@@ -20,6 +22,8 @@ public class MarineDrone : Drone
     private float startingBattery;
     private float movementDelay = 0;
     private float currentMovementDelay;
+    bool reachedStartingPoint = false;
+    bool movingToStartingPoint = false;
 
     private void Start()
     {
@@ -35,6 +39,11 @@ public class MarineDrone : Drone
             return;
         }
 
+        if (charging)
+        {
+            chargeLine.SetPosition(0, Charger.transform.position);
+            chargeLine.SetPosition(1, transform.position);
+        }
 
         if (charging || TraversableCells.Count == 0)
             return;
@@ -44,9 +53,19 @@ public class MarineDrone : Drone
 
         if (GameManager.Instance.Playing && traversedCells < TraversableCells.Count)
         {
+            if (movingToStartingPoint == false)
+            {
+                movingToStartingPoint = true;
+                StartCoroutine(MoveToStartPoint());
+            }
+
+            if (reachedStartingPoint == false)
+                return;
+
+
             currentMovementDelay += Time.deltaTime;
             movementDelay = 1 / droneManager.metersPS;
-
+            Battery -= Time.deltaTime;
             if (currentMovementDelay > movementDelay)
             {
                 MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
@@ -62,8 +81,6 @@ public class MarineDrone : Drone
                 else
                     gridPositionIndex++;
 
-
-                Battery -= Time.deltaTime;
 
                 if (Battery < 0)
                     StartCoroutine(Recharge());
@@ -93,6 +110,15 @@ public class MarineDrone : Drone
         }
 
         return current;
+    }
+
+    IEnumerator MoveToStartPoint()
+    {
+        MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
+        Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
+        transform.DOMove(gridManager.GetIndexPosition(coords), 5);
+        yield return new WaitForSeconds(5);
+        reachedStartingPoint = true;
     }
 
     public override void Initialize(Color32 tColor)
@@ -147,7 +173,7 @@ public class MarineDrone : Drone
     private IEnumerator Recharge()
     {
         Charger = FindCharger();
-
+        chargeLine.positionCount = 2;
         charging = true;
         float distance = Vector3.Distance(transform.position, Charger.transform.position);
         droneMesh.transform.DOMove(Charger.transform.position, distance);
@@ -161,6 +187,7 @@ public class MarineDrone : Drone
         yield return new WaitForSeconds(distance + .25f);
         droneMesh.transform.position = transform.position;
         charging = false;
+        chargeLine.positionCount = 0;
     }
 
     // void OnDrawGizmos()

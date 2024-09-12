@@ -36,6 +36,7 @@ public class GridManager : MonoBehaviour
     private Vector3 offsetPos;
     private Texture2D voronoiDiagram;
     public Color cleanedColor;
+    private Texture2D ot;
 
     public int TotalCellCount => mapData.bitmap.width * mapData.bitmap.height;
     public float GetGridSize => gs;
@@ -51,7 +52,7 @@ public class GridManager : MonoBehaviour
     private bool placingChargers;
     private List<Vector2Int> chargerLocations = new List<Vector2Int>();
 
-    private void Start()
+    void Start()
     {
         Init();
     }
@@ -67,12 +68,20 @@ public class GridManager : MonoBehaviour
 
         var overlayQuad = Instantiate(quad, new Vector3(gridXLength / 4, .1f, gridXLength / 2), quad.transform.rotation);
         overlayQuad.material = overlayMaterial;
-        overlayQuad.material.mainTexture = mapData.overlayMap;
+
+        ot = new Texture2D(mapData.overlayMap.width, mapData.overlayMap.height);
+        ot.filterMode = FilterMode.Point;
+        ot.SetPixels(mapData.overlayMap.GetPixels());
+        ot.Apply();
+        overlayQuad.material.mainTexture = ot;
+
         overlayQuad.material.color = new Color(1, 1, 1, .5f);
         overlayQuad.gameObject.name = "OverlayMap";
         inputMap.transform.localScale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y);
 
         gs = quad.GetComponent<MeshRenderer>().bounds.size.x / mapData.bitmap.width;
+
+        mapData.overlayMap.filterMode = FilterMode.Point;
 
         StartCoroutine(GenerateMap(mapData.bitmap));
     }
@@ -120,8 +129,18 @@ public class GridManager : MonoBehaviour
 
     public void PlaceDrones()
     {
+        StartCoroutine(PlaceDronesRoutine());
+    }
+
+    public IEnumerator PlaceDronesRoutine()
+    {
         if (centroids.Count == 0)
-            return;
+            yield break;
+
+        loadingBar.Show();
+        loadingBar.UpdateProgress("Adding drones and chargers...", 0, 3);
+
+        yield return 0;
 
         FindObjectsByType<Drone>(FindObjectsSortMode.None).ToList().ForEach(x => Destroy(x.gameObject)); //! replace with a marker instead.
 
@@ -141,6 +160,10 @@ public class GridManager : MonoBehaviour
 
         voronoiDiagram = voronoiUtility.CreateDiagram(colorRegions, new Vector2Int(mapData.bitmap.width, mapData.bitmap.height), centroids.ToArray());
 
+        loadingBar.UpdateProgress("Drawing region values...", 1, 3);
+
+        yield return 0;
+
         for (int x = 0; x < mapData.bitmap.width; x++)
             for (int y = 0; y < mapData.bitmap.height; y++)
             {
@@ -154,7 +177,6 @@ public class GridManager : MonoBehaviour
         quad.material.mainTexture = voronoiDiagram;
         voronoiDiagram.Apply();
 
-        //todo test ----
 
         for (int lists = 0; lists < colorRegions.Length; lists++)
         {
@@ -184,11 +206,19 @@ public class GridManager : MonoBehaviour
                     drones[i].SetTraversableCells(traversableAreas[i]);
             }
 
+        loadingBar.UpdateProgress("Assigning traversable areas...", 2, 3);
+
+        yield return 0;
+
         droneHUD.gameObject.SetActive(true);
         traversableAreaCount = traversableAreas.SelectMany(list => list).Distinct().Count();
         var icons = FindObjectsByType<UIMapIcon>(FindObjectsSortMode.None).ToList();
         icons.ForEach(x => Destroy(x.gameObject));
         OnMapGenerationComplete(chargerLocations);
+
+        loadingBar.UpdateProgress("Simulation loaded...", 3, 3);
+        yield return new WaitForSeconds(.5f);
+        loadingBar.Hide();
     }
 
     private void AddCoordinatesToDroneList(Vector2Int v)
@@ -218,6 +248,7 @@ public class GridManager : MonoBehaviour
             if (voronoiDiagram != null)
             {
                 voronoiDiagram.Apply();
+                ot.Apply();
                 updateTexture = false;
             }
         }
@@ -230,21 +261,19 @@ public class GridManager : MonoBehaviour
         AddCoordinatesToDroneList(coord);
 
         if (placingDrones)
-        {
-            Instantiate(droneIcon, worldSpace, Quaternion.identity);
-            Debug.Log("instance drone icon");
-        }
+            Instantiate(droneIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
         else if (placingChargers)
-        {
-            Instantiate(chargerIcon, worldSpace, Quaternion.identity);
-        }
+            Instantiate(chargerIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
     }
 
     public Vector3 GetIndexPosition(Vector2Int coords)
     {
         Vector3 pos = new Vector3(mapCells[coords.x, coords.y].xPos, 0, mapCells[coords.x, coords.y].zPos);
         if (voronoiDiagram != null)
+        {
+            ot.SetPixel(coords.x, coords.y, cleanedColor);
             voronoiDiagram.SetPixel(coords.x, coords.y, cleanedColor);
+        }
         updateTexture = true;
         return pos;
     }

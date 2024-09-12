@@ -13,7 +13,8 @@ public class DroneManager : MonoBehaviour
     public TMP_InputField NameText;
     public TMP_InputField BatteryText;
     public TMP_InputField CapacityText;
-    public TMP_InputField SpeedText;
+    public TMP_InputField VelocityText;
+    public TMP_InputField ChargerSpeed;
     public TextMeshProUGUI SpaceClearedText;
     public float metersPS = 5;
 
@@ -38,23 +39,38 @@ public class DroneManager : MonoBehaviour
 
     private void Start()
     {
-        NameText.text = "asdas";
-        BatteryText.text = "100";
-        CapacityText.text = "100";
-        SpeedText.text = "100";
-
         gridManager.OnMapGenerationComplete += InitializeDrones;
     }
 
     private void InitializeDrones(List<Vector2Int> chargerLocations)
     {
+        //todo Create a class with default settings from text fields for each drone created
+        //todo Assign each new drone a class, pair it with an icon
+        //todo if the icon is pressed, show panel
+        //todo button press to change the info class
+
         drones = gridManager.GetDrones;
         drones.ForEach(x =>
         {
-            x.Name = NameText.text;
-            x.Battery = float.Parse(BatteryText.text);
-            x.Capacity = int.Parse(CapacityText.text);
-            x.Speed = float.Parse(SpeedText.text);
+            x.Name = NameText.text + " " + UnityEngine.Random.Range(0, 1000).ToString();
+
+            float batteryResult = 0;
+            if (float.TryParse(BatteryText.text, out batteryResult))
+                x.Battery = batteryResult;
+            else
+                x.Battery = 0;
+
+            float capacityResult = 0;
+            if (float.TryParse(CapacityText.text, out capacityResult))
+                x.Capacity = capacityResult;
+            else
+                x.Capacity = 0;
+
+            float speedResult = 0;
+            if (float.TryParse(VelocityText.text, out speedResult))
+                x.Velocity = speedResult;
+            else
+                x.Velocity = 0;
         });
 
         for (int i = 0; i < chargerLocations.Count; i++)

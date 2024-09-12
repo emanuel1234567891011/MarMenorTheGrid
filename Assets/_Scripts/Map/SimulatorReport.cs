@@ -16,7 +16,10 @@ public class SimulatorReport : MonoBehaviour
     private void Start()
     {
         _droneManager = FindAnyObjectByType<DroneManager>();
-        CSVManager.AppendToReport(new string[3] { "1", "1255225", "125 Watts" });
+        for (int i = 0; i < 30; i++)
+        {
+            CSVManager.AppendToReport(new string[6] { i + 1.ToString(), Random.Range(0, 2000).ToString() + " mAh", "2.5 m/s", "100 kg", "2000 aH", ".23 c / hr" });
+        }
         CSVManager.PrintReportPath();
     }
 

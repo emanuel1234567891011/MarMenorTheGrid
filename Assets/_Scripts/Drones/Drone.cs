@@ -11,10 +11,10 @@ public class Drone : MonoBehaviour
     //unique functionality to the derived classes. (Marine, Air)
 
     public string Name;
-    public float Speed;
+    public float Velocity;
     public float ChargeDuration = 10;
     public float Battery;
-    public int Capacity;
+    public float Capacity;
     public Color32 TraversableColor;
     public List<MapCellData> TraversableCells = new List<MapCellData>();
     public DroneCharger Charger;
