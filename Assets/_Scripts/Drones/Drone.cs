@@ -14,6 +14,8 @@ public class Drone : MonoBehaviour
     public float Velocity;
     public float ChargeDuration = 10;
     public float Battery;
+    public float WasteCollected;
+    public float EnergyConsumed;
     public float Capacity;
     public Color32 TraversableColor;
     public List<MapCellData> TraversableCells = new List<MapCellData>();
@@ -42,5 +44,8 @@ public class Drone : MonoBehaviour
         TraversableCells = a;
     }
 }
+
+
+
 
 

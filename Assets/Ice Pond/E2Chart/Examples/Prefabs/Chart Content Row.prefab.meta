@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2c158cd7bc548e9498a0eff400486a38
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Examples/Prefabs/Chart Content Row.prefab
+  uploadId: 640648

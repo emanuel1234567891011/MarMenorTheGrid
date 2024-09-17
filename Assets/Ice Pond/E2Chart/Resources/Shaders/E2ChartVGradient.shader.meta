@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e6004510f3d1e7d47a47b0d5922b21a9
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Resources/Shaders/E2ChartVGradient.shader
+  uploadId: 640648

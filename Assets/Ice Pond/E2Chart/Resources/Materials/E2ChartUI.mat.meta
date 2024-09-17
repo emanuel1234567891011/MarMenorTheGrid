@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: fe8ec7f0d2884ab4593eb7e091bc8234
+timeCreated: 1604839263
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Resources/Materials/E2ChartUI.mat
+  uploadId: 640648

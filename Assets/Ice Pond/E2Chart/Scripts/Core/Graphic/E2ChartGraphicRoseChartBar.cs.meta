@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 612d68fab8fc91b46a3f1c1aecc1c028
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Core/Graphic/E2ChartGraphicRoseChartBar.cs
+  uploadId: 640648

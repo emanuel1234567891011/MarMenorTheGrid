@@ -4,8 +4,6 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.UI;
-using Unity.Mathematics;
-using NUnit.Framework.Constraints;
 
 public class DroneManager : MonoBehaviour
 {
@@ -21,6 +19,7 @@ public class DroneManager : MonoBehaviour
     public GridManager gridManager;
     public List<Drone> drones = new List<Drone>();
     private List<DroneCharger> chargers = new List<DroneCharger>();
+    private List<DroneConfig> droneConfigs = new List<DroneConfig>();
 
     int clearedSpaces = 0;
 
@@ -50,28 +49,8 @@ public class DroneManager : MonoBehaviour
         //todo button press to change the info class
 
         drones = gridManager.GetDrones;
-        drones.ForEach(x =>
-        {
-            x.Name = NameText.text + " " + UnityEngine.Random.Range(0, 1000).ToString();
 
-            float batteryResult = 0;
-            if (float.TryParse(BatteryText.text, out batteryResult))
-                x.Battery = batteryResult;
-            else
-                x.Battery = 0;
-
-            float capacityResult = 0;
-            if (float.TryParse(CapacityText.text, out capacityResult))
-                x.Capacity = capacityResult;
-            else
-                x.Capacity = 0;
-
-            float speedResult = 0;
-            if (float.TryParse(VelocityText.text, out speedResult))
-                x.Velocity = speedResult;
-            else
-                x.Velocity = 0;
-        });
+        //todo add configs.
 
         for (int i = 0; i < chargerLocations.Count; i++)
         {
@@ -79,4 +58,32 @@ public class DroneManager : MonoBehaviour
             chargers.Add(dc);
         }
     }
+
+    public void AddDroneConfig(int iconIndex)
+    {
+        float batteryResult = float.Parse(BatteryText.text);
+        float capacityResult = float.Parse(CapacityText.text);
+        float velocity = float.Parse(VelocityText.text);
+        DroneConfig dc = new DroneConfig(iconIndex, NameText.text + " # " + UnityEngine.Random.Range(0, 1000), batteryResult, capacityResult, velocity);
+        droneConfigs.Add(dc);
+    }
+}
+
+[SerializeField]
+public class DroneConfig
+{
+    public DroneConfig(int iconIndex, string name, float battery, float capacity, float velocity)
+    {
+        IconIndex = iconIndex;
+        Name = name;
+        Battery = battery;
+        Capacity = capacity;
+        Velocity = velocity;
+    }
+
+    public int IconIndex = 0;
+    public string Name;
+    public float Battery;
+    public float Capacity;
+    public float Velocity;
 }

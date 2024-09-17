@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: fc74c304cbeb1a940a0fa44aee2b89df
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Examples/Scenes/Example_Extend_ChartCombiner.unity
+  uploadId: 640648

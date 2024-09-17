@@ -57,7 +57,22 @@ public class UserInput : MonoBehaviour
                     pixelUV.y *= tex.height;
 
                     if (tex.GetPixel((int)pixelUV.x, (int)pixelUV.y) == Color.blue)
-                        FindAnyObjectByType<GridManager>().MapInteracted(new Vector2Int((int)pixelUV.x, (int)pixelUV.y), hit.point);
+                    {
+                        GridManager gm = FindAnyObjectByType<GridManager>();
+                        DroneManager dm = FindAnyObjectByType<DroneManager>();
+                        gm.MapInteracted(new Vector2Int((int)pixelUV.x, (int)pixelUV.y), hit.point);
+
+                        if (gm.placingDrones)
+                        {
+                            //todo create a panel for drone config edit
+                            //todo assign to drone config based on icon index
+                            dm.AddDroneConfig(gm.droneIcons.Count - 1);
+                        }
+                        else
+                        {
+                            //todo add charger config
+                        }
+                    }
                 }
                 else
                 {
@@ -70,6 +85,5 @@ public class UserInput : MonoBehaviour
         if (currentDrone)
             hud.PopulateDroneInfo(currentDrone.Name, currentDrone.Capacity, currentDrone.Battery, currentDrone.Velocity);
     }
-
 }
 

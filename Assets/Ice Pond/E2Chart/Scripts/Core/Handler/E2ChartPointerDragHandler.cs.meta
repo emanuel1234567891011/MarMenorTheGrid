@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d4bf8942f2e7e4543aa727007d26eea2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Core/Handler/E2ChartPointerDragHandler.cs
+  uploadId: 640648

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 15349672d004d6a4e821791147ee58c5
+timeCreated: 1586157919
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Resources/Shaders/E2ChartRing.shader
+  uploadId: 640648

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6d11c1d224894cedaf05cd9d24ca729, type: 3}
-  m_Name: SOG
+  m_Name: SOG 1
   m_EditorClassIdentifier: 
-  bitmap: {fileID: 2800000, guid: bb2c5339e14a48630acb36b1425ea521, type: 3}
-  overlayMap: {fileID: 2800000, guid: ecdd74f2c6820fc3ea3167a3182a0cff, type: 3}
+  bitmap: {fileID: 2800000, guid: e83bbcbc3b7b7d18482cfa034bc8f485, type: 3}
+  overlayMap: {fileID: 2800000, guid: 0f31e8ecdbf48d2f08e0b2cbd5f15289, type: 3}

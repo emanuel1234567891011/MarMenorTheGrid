@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 75cc12f5a262b8a4d87da8bc6240f3f3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Editor/E2ChartDataImporterEditor.cs
+  uploadId: 640648

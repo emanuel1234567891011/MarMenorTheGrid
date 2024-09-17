@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 0cd1af1c8e2610d4d8a83bbbc3124c3a
+timeCreated: 1598025311
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Resources/Materials/E2ChartVBlur.mat
+  uploadId: 640648

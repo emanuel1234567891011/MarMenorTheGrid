@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a36987f81f1ea8a449f0f8b3361b13af
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Presets/E2ChartOptionsProfileColor.asset
+  uploadId: 640648

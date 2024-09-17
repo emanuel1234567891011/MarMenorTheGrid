@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1b850954bd694754bbae834cac8f19bb
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Presets/E2ChartOptionsDarkNoGrid.prefab
+  uploadId: 640648

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c36f0bad0d4a9c84c8f507a8d86b03c3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Core/Builder/E2ChartGridRect.cs
+  uploadId: 640648

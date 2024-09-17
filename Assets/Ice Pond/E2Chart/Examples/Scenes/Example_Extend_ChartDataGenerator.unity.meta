@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a38956f4cb1fdd741becb30f3bf0a8e9
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Examples/Scenes/Example_Extend_ChartDataGenerator.unity
+  uploadId: 640648

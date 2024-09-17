@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6cc4afa8dee82f744b5ea69b0e1157be
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Core/Builder/E2ChartBuilderLineChart.cs
+  uploadId: 640648

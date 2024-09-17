@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b548478fabd4759409029a7a1f65783f
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Examples/Scenes/Example_Basic_3_Scripting.unity
+  uploadId: 640648

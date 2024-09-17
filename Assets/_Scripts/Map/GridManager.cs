@@ -10,8 +10,8 @@ public class GridManager : MonoBehaviour
     public MarineDrone dronePrefab;
 
     [Header("References")]
-    public GameObject droneIcon;
-    public GameObject chargerIcon;
+    public UIMapIcon droneIcon;
+    public UIMapIcon chargerIcon;
     public MapData mapData;
     public Material overlayMaterial;
     public MeshRenderer inputMap;
@@ -48,9 +48,12 @@ public class GridManager : MonoBehaviour
     private List<Drone> drones = new List<Drone>();
 
     public event Action<List<Vector2Int>> OnMapGenerationComplete = delegate { };
-    private bool placingDrones = true;
-    private bool placingChargers;
+    public bool placingDrones = true;
+    public bool placingChargers;
     private List<Vector2Int> chargerLocations = new List<Vector2Int>();
+    public List<UIMapIcon> droneIcons = new List<UIMapIcon>();
+    public List<UIMapIcon> chargerIcons = new List<UIMapIcon>();
+
 
     void Start()
     {
@@ -78,12 +81,18 @@ public class GridManager : MonoBehaviour
         overlayQuad.material.color = new Color(1, 1, 1, .5f);
         overlayQuad.gameObject.name = "OverlayMap";
         inputMap.transform.localScale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y);
-
+        inputMap.gameObject.SetActive(false);
         gs = quad.GetComponent<MeshRenderer>().bounds.size.x / mapData.bitmap.width;
 
         mapData.overlayMap.filterMode = FilterMode.Point;
 
         StartCoroutine(GenerateMap(mapData.bitmap));
+    }
+
+    public void ShowInputMap()
+    {
+        inputMap.gameObject.SetActive(true);
+
     }
 
     private IEnumerator GenerateMap(Texture2D bitMap)
@@ -261,9 +270,17 @@ public class GridManager : MonoBehaviour
         AddCoordinatesToDroneList(coord);
 
         if (placingDrones)
-            Instantiate(droneIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
+        {
+            UIMapIcon d = Instantiate(droneIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
+            droneIcons.Add(d);
+            d.iconIndex = droneIcons.Count;
+        }
         else if (placingChargers)
-            Instantiate(chargerIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
+        {
+            UIMapIcon d = Instantiate(chargerIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
+            chargerIcons.Add(d);
+            d.iconIndex = chargerIcons.Count;
+        }
     }
 
     public Vector3 GetIndexPosition(Vector2Int coords)

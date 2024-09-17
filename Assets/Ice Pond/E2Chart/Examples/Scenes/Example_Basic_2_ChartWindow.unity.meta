@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: daef16cc1457fec4ab9ffc8b03d52bbd
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Examples/Scenes/Example_Basic_2_ChartWindow.unity
+  uploadId: 640648

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fc2308bbefbe4b04d92dba4963b07afc
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Examples/Scripts/E2ChartExampleScripting.cs
+  uploadId: 640648

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 44ac42695adc729469d3e9ff7fff9fa6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Presets/E2ChartOptionsProfileAll.asset
+  uploadId: 640648

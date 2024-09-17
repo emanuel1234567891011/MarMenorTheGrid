@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8715aa4a75efd9e4c8d0a115f18e1741
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Core/Handler/E2ChartPreviewHandler.cs
+  uploadId: 640648

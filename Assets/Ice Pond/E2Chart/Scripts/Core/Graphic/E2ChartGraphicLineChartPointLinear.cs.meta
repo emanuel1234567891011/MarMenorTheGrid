@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6740855d2dc220c4fb88ce0ef6191c1b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Scripts/Core/Graphic/E2ChartGraphicLineChartPointLinear.cs
+  uploadId: 640648

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: c62d8cf1285bd7a42b553787032fa3ff
+timeCreated: 1598083839
+licenseType: Store
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 147893
+  packageName: E2Chart
+  packageVersion: 3.3.2
+  assetPath: Assets/Ice Pond/E2Chart/Resources/Shaders/E2ChartUBlur.shader
+  uploadId: 640648
