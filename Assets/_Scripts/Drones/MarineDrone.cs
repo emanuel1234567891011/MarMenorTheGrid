@@ -48,7 +48,7 @@ public class MarineDrone : Drone
         if (charging || TraversableCells.Count == 0)
             return;
 
-        if (TraversableCells.Count > 0 && gridConstructed == false)
+        if (TraversableCells.Count > 1 && gridConstructed == false)
             ContsructGrid();
 
         if (GameManager.Instance.Playing && traversedCells < TraversableCells.Count)
@@ -161,8 +161,8 @@ public class MarineDrone : Drone
 
     public override void SetTraversableCells(List<MapCellData> a)
     {
-        base.SetTraversableCells(a);
-
+        if (TraversableCells.Count == 0)
+            TraversableCells = a;
     }
 
     private float CoverageProgress()

@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6d11c1d224894cedaf05cd9d24ca729, type: 3}
+  m_Name: SOG
+  m_EditorClassIdentifier: 
+  bitmap: {fileID: 2800000, guid: ffbf79a712b4126539256bf48f6861a3, type: 3}
+  overlayMap: {fileID: 2800000, guid: eede6d9875d10b9d6b4a1dfcdfa79dd9, type: 3}

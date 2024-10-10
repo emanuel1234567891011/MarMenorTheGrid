@@ -54,14 +54,10 @@ public class GridManager : MonoBehaviour
     public List<UIMapIcon> droneIcons = new List<UIMapIcon>();
     public List<UIMapIcon> chargerIcons = new List<UIMapIcon>();
 
-
-    void Start()
-    {
-        Init();
-    }
-
     public void Init()
     {
+        mapData = FindAnyObjectByType<MapUploadUtility>()._testMapData; //! remove and replace with result of list selection.
+
         mapCells = new MapCellData[mapData.bitmap.width, mapData.bitmap.height];
 
         ar = (float)mapData.bitmap.width / mapData.bitmap.height;
@@ -85,17 +81,17 @@ public class GridManager : MonoBehaviour
         gs = quad.GetComponent<MeshRenderer>().bounds.size.x / mapData.bitmap.width;
 
         mapData.overlayMap.filterMode = FilterMode.Point;
-
-        StartCoroutine(GenerateMap(mapData.bitmap));
     }
 
     public void ShowInputMap()
     {
         inputMap.gameObject.SetActive(true);
-
+        ar = (float)mapData.bitmap.width / mapData.bitmap.height;
+        inputMap.GetComponent<MeshRenderer>().material.mainTexture = FindAnyObjectByType<MapUploadUtility>()._testMapData.bitmap;
+        inputMap.transform.localScale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y);
     }
 
-    private IEnumerator GenerateMap(Texture2D bitMap)
+    private void GenerateMap(Texture2D bitMap)
     {
         for (int i = 0; i < mapCells.GetLength(0); i++)
             for (int j = 0; j < mapCells.GetLength(1); j++)
@@ -111,8 +107,6 @@ public class GridManager : MonoBehaviour
                 else if (wholeColor == Color.blue)
                     mapCells[i, j].isWater = true;
             }
-
-        yield return 0;
 
         Texture2D tex = new Texture2D(bitMap.width, bitMap.height);
         int texIndex = 0;
@@ -138,6 +132,8 @@ public class GridManager : MonoBehaviour
 
     public void PlaceDrones()
     {
+        Init();
+        GenerateMap(mapData.bitmap);
         StartCoroutine(PlaceDronesRoutine());
     }
 
@@ -212,7 +208,9 @@ public class GridManager : MonoBehaviour
             for (int j = 0; j < traversableAreas.Count; j++)
             {
                 if (drones[i].TraversableColor.Equals(traversableAreas[i].ElementAt(0).color)) //todo sometimes this value is null or does not exist.
+                {
                     drones[i].SetTraversableCells(traversableAreas[i]);
+                }
             }
 
         loadingBar.UpdateProgress("Assigning traversable areas...", 2, 3);
