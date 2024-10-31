@@ -56,12 +56,9 @@ public class GridManager : MonoBehaviour
 
     public void Init()
     {
-        mapData = FindAnyObjectByType<MapUploadUtility>()._testMapData; //! remove and replace with result of list selection.
-
         mapCells = new MapCellData[mapData.bitmap.width, mapData.bitmap.height];
 
         ar = (float)mapData.bitmap.width / mapData.bitmap.height;
-
         quad.transform.localScale = new Vector3(gridXLength * ar, gridXLength);
         quad.transform.position = new Vector3(gridXLength / 4, 0, gridXLength / 2);
 
@@ -81,13 +78,15 @@ public class GridManager : MonoBehaviour
         gs = quad.GetComponent<MeshRenderer>().bounds.size.x / mapData.bitmap.width;
 
         mapData.overlayMap.filterMode = FilterMode.Point;
+
+        ShowInputMap();
     }
 
     public void ShowInputMap()
     {
         inputMap.gameObject.SetActive(true);
         ar = (float)mapData.bitmap.width / mapData.bitmap.height;
-        inputMap.GetComponent<MeshRenderer>().material.mainTexture = FindAnyObjectByType<MapUploadUtility>()._testMapData.bitmap;
+        inputMap.GetComponent<MeshRenderer>().material.mainTexture = mapData.bitmap;
         inputMap.transform.localScale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y);
     }
 
@@ -132,7 +131,6 @@ public class GridManager : MonoBehaviour
 
     public void PlaceDrones()
     {
-        Init();
         GenerateMap(mapData.bitmap);
         StartCoroutine(PlaceDronesRoutine());
     }

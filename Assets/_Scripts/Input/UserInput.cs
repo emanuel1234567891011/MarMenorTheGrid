@@ -45,7 +45,6 @@ public class UserInput : MonoBehaviour
 
                 if (hit.collider.GetComponent<UIMapIcon>() != null)
                 {
-                    Debug.Log("hit icon");
                     return;
                 }
                 else if (hit.collider.tag == "map")

@@ -23,6 +23,10 @@ public class DefaultValues : MonoBehaviour
     public int _mapWidth = 24;
     public int _mapHeight = 12;
     public TMP_InputField _mapHeightText;
+    public MapSelectionButton _selectionButtonPrefab;
+    public List<MapData> _maps = new List<MapData>();
+    List<MapSelectionButton> _buttons = new List<MapSelectionButton>();
+    public Transform _selectionButtonContainer;
 
     public TMP_InputField[] inputFields;
     int currentField = 0;
@@ -39,6 +43,23 @@ public class DefaultValues : MonoBehaviour
         _mapHeightText.text = _mapHeight.ToString();
         _costOfElectricityText.text = _costOfElectricity.ToString();
 
+        _maps.ForEach(x =>
+        {
+            MapSelectionButton b = Instantiate(_selectionButtonPrefab, _selectionButtonContainer);
+            b.Init(x, this);
+            _buttons.Add(b);
+        });
+    }
+
+    public void MapButtonClicked(MapSelectionButton b)
+    {
+        _buttons.ForEach(x =>
+        {
+            if (b == x)
+                x.Select();
+            else
+                x.Deselect();
+        });
     }
 
     public void OnConfirmConfig()

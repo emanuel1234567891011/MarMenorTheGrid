@@ -10,4 +10,5 @@ public class MapData : ScriptableObject
     public Texture2D overlayMap;
     public int mapWidth;
     public int mapHeight;
+    public string description;
 }
