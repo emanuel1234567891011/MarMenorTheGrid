@@ -47,10 +47,13 @@ public class GridManager : MonoBehaviour
     private List<Vector2Int> centroids = new List<Vector2Int>();
     private List<Drone> drones = new List<Drone>();
 
+    public int DroneCount => centroids.Count;
+
     public event Action<List<Vector2Int>> OnMapGenerationComplete = delegate { };
     public bool placingDrones = true;
     public bool placingChargers;
     private List<Vector2Int> chargerLocations = new List<Vector2Int>();
+    public int ChargerCount => chargerLocations.Count;
     public List<UIMapIcon> droneIcons = new List<UIMapIcon>();
     public List<UIMapIcon> chargerIcons = new List<UIMapIcon>();
 
