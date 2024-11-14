@@ -83,7 +83,7 @@ public static class CSVManager
 
     public static void CreateExpenseReport()
     {
-        using (StreamWriter sw = File.CreateText(GetFilePath()))
+        using (StreamWriter sw = File.CreateText(GetExpenseReportFilePath()))
         {
             string finalString = "";
             for (int i = 0; i < budgetReportHeaders.Length; i++)
@@ -145,12 +145,12 @@ public static class CSVManager
     }
 
 
-    static string GetExpenseReportDirectoryPath()
+    public static string GetExpenseReportDirectoryPath()
     {
         return Application.persistentDataPath + "/" + reportDirectoryName;
     }
 
-    static string GetExpenseReportFilePath()
+    public static string GetExpenseReportFilePath()
     {
         return GetDirectoryPath() + "/" + expenseReportFileName;
     }

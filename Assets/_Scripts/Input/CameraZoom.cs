@@ -18,7 +18,7 @@ public class CameraZoom : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.Playing && EventSystem.current.currentSelectedGameObject == null)
+        if (FindAnyObjectByType<GameManager>().Playing && EventSystem.current.currentSelectedGameObject == null)
         {
             float scrollInput = Input.GetAxis("Mouse ScrollWheel");
             if (scrollInput > 0)

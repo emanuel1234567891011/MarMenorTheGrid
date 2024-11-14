@@ -41,6 +41,7 @@ public class Drone : MonoBehaviour
 
     public virtual void SetTraversableCells(List<MapCellData> a)
     {
+
     }
 }
 

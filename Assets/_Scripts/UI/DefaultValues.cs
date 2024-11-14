@@ -75,7 +75,7 @@ public class DefaultValues : MonoBehaviour
 
         SimulationConfig config = new SimulationConfig(n, bc, v, wc, cs, col, mw, mh);
 
-        GameManager.Instance.AddConfig(config);
+        FindAnyObjectByType<GameManager>().AddConfig(config);
     }
 
     void Update()

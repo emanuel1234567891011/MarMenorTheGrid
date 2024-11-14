@@ -18,7 +18,7 @@ public class GridManager : MonoBehaviour
     public VoronoiUtility voronoiUtility;
     public LoadingBar loadingBar;
     public DroneHUDController droneHUD;
-    public TMP_InputField droneCountInput;
+    public MeshRenderer _satelliteQuad;
 
     int traversableAreaCount;
 
@@ -76,8 +76,12 @@ public class GridManager : MonoBehaviour
 
         overlayQuad.material.color = new Color(1, 1, 1, .5f);
         overlayQuad.gameObject.name = "OverlayMap";
-        inputMap.transform.localScale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y);
+        Vector3 scale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y); ;
+        inputMap.transform.localScale = scale;
         inputMap.gameObject.SetActive(false);
+        _satelliteQuad.transform.localScale = scale;
+        _satelliteQuad.transform.position = new Vector3(inputMap.transform.position.x, inputMap.transform.transform.position.y + .001f, inputMap.transform.transform.position.z);
+        _satelliteQuad.material.mainTexture = mapData.overlayMap;
         gs = quad.GetComponent<MeshRenderer>().bounds.size.x / mapData.bitmap.width;
 
         mapData.overlayMap.filterMode = FilterMode.Point;
@@ -130,6 +134,16 @@ public class GridManager : MonoBehaviour
         quad.material.mainTexture = tex;
         quad.material.mainTexture.filterMode = FilterMode.Point;
         inputMap.material.mainTexture = tex;
+    }
+
+    public void ShowUIInputMap()
+    {
+        _satelliteQuad.gameObject.SetActive(true);
+    }
+
+    public void HideUIInputMap()
+    {
+        _satelliteQuad.gameObject.SetActive(false);
     }
 
     public void PlaceDrones()

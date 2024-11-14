@@ -40,24 +40,24 @@ public class DroneHUDController : MonoBehaviour
 
     private void Update()
     {
-        var ts = TimeSpan.FromSeconds(GameManager.Instance.CurrentSimTime);
-        simulationTime.text = string.Format("{0:00}:{1:00}", ts.Minutes, ts.Seconds);
-        timeScaleText.text = Time.timeScale.ToString();
+        var ts = TimeSpan.FromSeconds(FindAnyObjectByType<GameManager>().CurrentSimTime);
+        simulationTime.text = "Simulation Time: " + string.Format("{0:00}:{1:00}", ts.Minutes, ts.Seconds);
+        timeScaleText.text = "Time Scale: " + Time.timeScale.ToString("#.##");
     }
 
     public void PopulateDroneInfo(string name, float capacity, float battery, float velocity)
     {
         droneName.text = name;
-        droneCapacity.text = capacity.ToString();
-        droneBattery.text = battery.ToString();
-        droneVelocity.text = velocity.ToString();
+        droneCapacity.text = "Waste Capacity: " + capacity.ToString("#.##");
+        droneBattery.text = "Battery Percentage: " + battery.ToString("#.##") + "%";
+        droneVelocity.text = "Current Velocity: " + velocity.ToString("#.##");
     }
 
     public void Clear()
     {
-        droneName.text = "--";
-        droneCapacity.text = "--";
-        droneBattery.text = "--";
-        droneVelocity.text = "--";
+        droneName.text = "no drone selected";
+        droneCapacity.text = "";
+        droneBattery.text = "";
+        droneVelocity.text = "";
     }
 }

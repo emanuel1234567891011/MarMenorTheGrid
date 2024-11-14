@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class SimulatorReport : MonoBehaviour
 {
-    //todo decide what variables are required to accurately calculate the requirements and draw for the drones
-    //todo how to calculate the electrical usage and capacity etc.
     public CanvasGroup graphCG;
 
     public float SnapShotInterval = 1;
@@ -25,7 +23,7 @@ public class SimulatorReport : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.Playing)
+        if (FindAnyObjectByType<GameManager>().Playing)
         {
             _currentShotTimer += Time.deltaTime;
             if (_currentShotTimer > SnapShotInterval)
@@ -37,7 +35,7 @@ public class SimulatorReport : MonoBehaviour
                     datas.Add(d);
                 }
 
-                SimulatorSnapshot snap = new SimulatorSnapshot(datas, GameManager.Instance.CurrentSimTime, GetPercentageCleaned());
+                SimulatorSnapshot snap = new SimulatorSnapshot(datas, FindAnyObjectByType<GameManager>().CurrentSimTime, GetPercentageCleaned());
                 snaps.Add(snap);
                 float w = Random.Range(0, 100);
                 wasteCollectedSeries.dataY.Add(w);

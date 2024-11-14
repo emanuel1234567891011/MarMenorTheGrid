@@ -9,7 +9,7 @@ public class CameraDrag : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.Playing && EventSystem.current.currentSelectedGameObject == null)
+        if (FindAnyObjectByType<GameManager>().Playing && EventSystem.current.currentSelectedGameObject == null)
         {
             if (Input.GetMouseButtonDown(0))
             {

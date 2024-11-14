@@ -40,6 +40,7 @@ public class UserInput : MonoBehaviour
             {
                 if (hit.collider.GetComponent<Drone>() != null)
                 {
+                    Debug.Log("detected drone");
                     currentDrone = hit.collider.GetComponent<Drone>();
                 }
 
@@ -49,6 +50,9 @@ public class UserInput : MonoBehaviour
                 }
                 else if (hit.collider.tag == "map")
                 {
+                    currentDrone = null;
+                    hud.Clear();
+
                     Renderer rend = hit.transform.GetComponent<Renderer>();
                     Texture2D tex = rend.material.mainTexture as Texture2D;
                     Vector2 pixelUV = hit.textureCoord;
@@ -72,11 +76,6 @@ public class UserInput : MonoBehaviour
                             //todo add charger config
                         }
                     }
-                }
-                else
-                {
-                    currentDrone = null;
-                    hud.Clear();
                 }
             }
         }

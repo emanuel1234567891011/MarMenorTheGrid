@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
     public float timeScale = 1;
     public SimulationConfig _currentConfig;
@@ -26,11 +26,13 @@ public class GameManager : Singleton<GameManager>
     public void StartSim()
     {
         Playing = true;
+        Time.timeScale = 1;
     }
 
     public void PauseSim()
     {
         Playing = false;
+        Time.timeScale = 0;
     }
 
     public void Restart()

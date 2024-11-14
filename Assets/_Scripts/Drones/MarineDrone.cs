@@ -33,6 +33,9 @@ public class MarineDrone : Drone
 
     private void Update()
     {
+        if (FindCharger() != null && Charger == null)
+            transform.position = FindCharger().transform.position;
+
         if (gridManager == null)
         {
             gridManager = FindFirstObjectByType<GridManager>();
@@ -51,7 +54,7 @@ public class MarineDrone : Drone
         if (TraversableCells.Count > 1 && gridConstructed == false)
             ContsructGrid();
 
-        if (GameManager.Instance.Playing && traversedCells < TraversableCells.Count)
+        if (FindAnyObjectByType<GameManager>().Playing && traversedCells < TraversableCells.Count)
         {
             if (movingToStartingPoint == false)
             {
