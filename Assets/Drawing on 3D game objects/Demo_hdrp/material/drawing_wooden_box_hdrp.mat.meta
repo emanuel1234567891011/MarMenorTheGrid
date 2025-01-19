@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 329a44a89d76cdf4c8039166c690c1df
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_hdrp/material/drawing_wooden_box_hdrp.mat
+  uploadId: 696501

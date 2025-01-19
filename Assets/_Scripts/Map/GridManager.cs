@@ -4,14 +4,17 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using TMPro;
+using cube_game.Drawing_on_3D_game_objects;
 
 public class GridManager : MonoBehaviour
 {
     public MarineDrone dronePrefab;
 
     [Header("References")]
+    public Color swimmingAreaColor;
     public UIMapIcon droneIcon;
     public UIMapIcon chargerIcon;
+    public UIMapIcon waypointsIcon;
     public MapData mapData;
     public Material overlayMaterial;
     public MeshRenderer inputMap;
@@ -45,7 +48,7 @@ public class GridManager : MonoBehaviour
     private List<MapCellData> droneStartingPoints = new List<MapCellData>();
 
     private List<Vector2Int> centroids = new List<Vector2Int>();
-    private List<Drone> drones = new List<Drone>();
+    private List<MarineDrone> drones = new List<MarineDrone>();
 
     public int DroneCount => centroids.Count;
 
@@ -56,6 +59,12 @@ public class GridManager : MonoBehaviour
     public int ChargerCount => chargerLocations.Count;
     public List<UIMapIcon> droneIcons = new List<UIMapIcon>();
     public List<UIMapIcon> chargerIcons = new List<UIMapIcon>();
+    List<Vector2Int> swimmingAreas = new List<Vector2Int>();
+    private Texture2D tex;
+
+    public bool placingWaypoints;
+    private List<Vector2Int> _wayPoints = new List<Vector2Int>();
+    private List<UIMapIcon> _waypointIcons = new List<UIMapIcon>();
 
     public void Init()
     {
@@ -87,14 +96,23 @@ public class GridManager : MonoBehaviour
         mapData.overlayMap.filterMode = FilterMode.Point;
 
         ShowInputMap();
+
+        FindAnyObjectByType<Drawing_control>().Init();
     }
 
     public void ShowInputMap()
     {
         inputMap.gameObject.SetActive(true);
         ar = (float)mapData.bitmap.width / mapData.bitmap.height;
-        inputMap.GetComponent<MeshRenderer>().material.mainTexture = mapData.bitmap;
+        //inputMap.GetComponent<MeshRenderer>().material.mainTexture = mapData.bitmap;
+        inputMap.GetComponent<MeshRenderer>().material.SetTexture("Texture2D_3f3542f4b23c413d97123944acaa3ef7", mapData.bitmap);
+        inputMap.GetComponent<MeshRenderer>().material.GetTexture("Texture2D_3f3542f4b23c413d97123944acaa3ef7").filterMode = FilterMode.Point;
         inputMap.transform.localScale = new Vector3(transform.localScale.x * ar, 1, transform.localScale.y);
+    }
+
+    public void SetSwimmingArea(List<Vector2Int> pos)
+    {
+        swimmingAreas = pos;
     }
 
     private void GenerateMap(Texture2D bitMap)
@@ -114,7 +132,7 @@ public class GridManager : MonoBehaviour
                     mapCells[i, j].isWater = true;
             }
 
-        Texture2D tex = new Texture2D(bitMap.width, bitMap.height);
+        tex = new Texture2D(bitMap.width, bitMap.height);
         int texIndex = 0;
         for (int i = 0; i < mapCells.GetLength(0); i++)
             for (int j = 0; j < mapCells.GetLength(1); j++)
@@ -150,6 +168,7 @@ public class GridManager : MonoBehaviour
     {
         GenerateMap(mapData.bitmap);
         StartCoroutine(PlaceDronesRoutine());
+        FindAnyObjectByType<DroneManager>().AddWaypoints(_wayPoints);
     }
 
     public IEnumerator PlaceDronesRoutine()
@@ -193,6 +212,13 @@ public class GridManager : MonoBehaviour
                 if (wholeColor == Color.black)
                     voronoiDiagram.SetPixel(x, y, Color.black);
             }
+
+        foreach (Vector2Int v in swimmingAreas)
+        {
+            Color wholeColor = new Color(Mathf.RoundToInt(mapData.bitmap.GetPixel(v.x, v.y).r), Mathf.RoundToInt(mapData.bitmap.GetPixel(v.x, v.y).g), Mathf.RoundToInt(mapData.bitmap.GetPixel(v.x, v.y).b), 1);
+            if (wholeColor == Color.blue)
+                voronoiDiagram.SetPixel(v.x, v.y, swimmingAreaColor);
+        }
 
         quad.material.mainTexture = voronoiDiagram;
         voronoiDiagram.Apply();
@@ -261,7 +287,7 @@ public class GridManager : MonoBehaviour
 
     public int GetTraversableAreaCount => traversableAreaCount;
 
-    public List<Drone> GetDrones => drones;
+    public List<MarineDrone> GetDrones => drones;
 
     private void LateUpdate()
     {
@@ -288,11 +314,19 @@ public class GridManager : MonoBehaviour
             droneIcons.Add(d);
             d.iconIndex = droneIcons.Count;
         }
-        else if (placingChargers)
+
+        if (placingChargers)
         {
             UIMapIcon d = Instantiate(chargerIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
             chargerIcons.Add(d);
             d.iconIndex = chargerIcons.Count;
+        }
+
+        if (placingWaypoints)
+        {
+            UIMapIcon w = Instantiate(waypointsIcon, new Vector3(worldSpace.x, worldSpace.y + .01f, worldSpace.z), Quaternion.identity);
+            _waypointIcons.Add(w);
+            w.iconIndex = _waypointIcons.Count;
         }
     }
 
@@ -314,16 +348,37 @@ public class GridManager : MonoBehaviour
         return pos;
     }
 
+    public void SelectingUnreachableAreas()
+    {
+        placingChargers = false;
+        placingDrones = false;
+        placingWaypoints = false;
+    }
+
     public void PlacingDrones()
     {
         placingChargers = false;
         placingDrones = true;
+        placingWaypoints = false;
     }
 
     public void PlacingChargers()
     {
         placingChargers = true;
         placingDrones = false;
+        placingWaypoints = false;
+    }
+
+    public void PlacingWaypoints()
+    {
+        placingChargers = false;
+        placingDrones = false;
+        placingWaypoints = true;
+    }
+
+    public void AddWaypoint(Vector2Int pos)
+    {
+        _wayPoints.Add(pos);
     }
 }
 

@@ -9,6 +9,8 @@ public class UserInput : MonoBehaviour
     [SerializeField] Color _selectedColor;
     [SerializeField] Button _placeDronesButton;
     [SerializeField] Button _placeChargerButton;
+    [SerializeField] Button _selectUnuseableAreaButton;
+    [SerializeField] Button _placingWayPointsButton;
 
     private Drone currentDrone = null;
 
@@ -21,12 +23,33 @@ public class UserInput : MonoBehaviour
     {
         _placeChargerButton.GetComponent<Image>().color = Color.white;
         _placeDronesButton.GetComponent<Image>().color = _selectedColor;
+        _selectUnuseableAreaButton.GetComponent<Image>().color = Color.white;
+        _placingWayPointsButton.GetComponent<Image>().color = Color.white;
     }
 
     public void PlaceChargersButtonPressed()
     {
         _placeChargerButton.GetComponent<Image>().color = _selectedColor;
         _placeDronesButton.GetComponent<Image>().color = Color.white;
+        _placingWayPointsButton.GetComponent<Image>().color = Color.white;
+        _selectUnuseableAreaButton.GetComponent<Image>().color = Color.white;
+    }
+
+    public void SetUnuseableAreaButtonsPressed()
+    {
+        _placeChargerButton.GetComponent<Image>().color = Color.white;
+        _placeDronesButton.GetComponent<Image>().color = Color.white;
+        _placingWayPointsButton.GetComponent<Image>().color = Color.white;
+        _selectUnuseableAreaButton.GetComponent<Image>().color = _selectedColor;
+    }
+
+
+    public void SetWayPointsButtonPressed()
+    {
+        _placeChargerButton.GetComponent<Image>().color = Color.white;
+        _placeDronesButton.GetComponent<Image>().color = Color.white;
+        _selectUnuseableAreaButton.GetComponent<Image>().color = Color.white;
+        _placingWayPointsButton.GetComponent<Image>().color = _selectedColor;
     }
 
     void Update()
@@ -54,8 +77,10 @@ public class UserInput : MonoBehaviour
                     hud.Clear();
 
                     Renderer rend = hit.transform.GetComponent<Renderer>();
-                    Texture2D tex = rend.material.mainTexture as Texture2D;
+                    Texture2D tex = (Texture2D)rend.material.GetTexture("Texture2D_3f3542f4b23c413d97123944acaa3ef7");
+
                     Vector2 pixelUV = hit.textureCoord;
+
                     pixelUV.x *= tex.width;
                     pixelUV.y *= tex.height;
 
@@ -71,9 +96,10 @@ public class UserInput : MonoBehaviour
                             //todo assign to drone config based on icon index
                             dm.AddDroneConfig(gm.droneIcons.Count - 1);
                         }
-                        else
+
+                        if (gm.placingWaypoints)
                         {
-                            //todo add charger config
+                            gm.AddWaypoint(new Vector2Int((int)pixelUV.x, (int)pixelUV.y));
                         }
                     }
                 }

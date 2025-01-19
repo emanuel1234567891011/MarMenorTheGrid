@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d5b76493439c9504ca17ca6b57f6b933
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/scripts/View_control.cs
+  uploadId: 696501

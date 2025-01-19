@@ -7,6 +7,7 @@ public class MapData : ScriptableObject
 {
     public string mapName;
     public Texture2D bitmap;
+    public Texture2D modifiedBitmap;
     public Texture2D overlayMap;
     public int mapWidth;
     public int mapHeight;

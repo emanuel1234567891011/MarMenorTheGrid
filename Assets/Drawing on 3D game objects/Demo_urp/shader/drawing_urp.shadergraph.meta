@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3cf961923ebe56946ac22265ee2bb636
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_urp/shader/drawing_urp.shadergraph
+  uploadId: 696501

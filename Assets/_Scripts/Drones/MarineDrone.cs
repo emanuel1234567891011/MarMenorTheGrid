@@ -4,9 +4,13 @@ using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using UnityEngine.Rendering.Universal;
+using Unity.Mathematics;
 
 public class MarineDrone : Drone
 {
+    public GameObject debugCube;
+    public DroneBehaviour behaviour;
     public MeshRenderer droneMesh;
     public LineRenderer chargeLine;
     private int totalTraversableCells;
@@ -22,19 +26,34 @@ public class MarineDrone : Drone
     private float startingBattery;
     private float movementDelay = 0;
     private float currentMovementDelay;
-    bool reachedStartingPoint = false;
     bool movingToStartingPoint = false;
+
+    DroneBehaviour _prevBehaviour;
+    int _currentWaypoint = 0;
+    float _movementSpeed = 1f;
+    float _minDist = .1f;
+    List<Vector3> waypointPos = new List<Vector3>();
+
+    GameManager gameManager;
 
     private void Start()
     {
         startingBattery = Battery;
         droneManager = FindAnyObjectByType<DroneManager>();
+        behaviour = DroneBehaviour.None;
+        gameManager = FindAnyObjectByType<GameManager>();
     }
 
     private void Update()
     {
+        Debug.Log(behaviour);
+
+        #region references
         if (FindCharger() != null && Charger == null)
+        {
             transform.position = FindCharger().transform.position;
+            Charger = FindCharger();
+        }
 
         if (gridManager == null)
         {
@@ -42,59 +61,113 @@ public class MarineDrone : Drone
             return;
         }
 
-        if (charging)
-        {
-            chargeLine.SetPosition(0, Charger.transform.position);
-            chargeLine.SetPosition(1, transform.position);
-        }
-
-        if (charging || TraversableCells.Count == 0)
-            return;
-
         if (TraversableCells.Count > 1 && gridConstructed == false)
             ContsructGrid();
 
-        if (FindAnyObjectByType<GameManager>().Playing && traversedCells < TraversableCells.Count)
+        if (gridConstructed && gameManager.Playing && behaviour == DroneBehaviour.None)
+            behaviour = DroneBehaviour.Initializing;
+
+        #endregion;
+
+        #region  initializing
+        if (behaviour == DroneBehaviour.Initializing)
         {
             if (movingToStartingPoint == false)
             {
                 movingToStartingPoint = true;
                 StartCoroutine(MoveToStartPoint());
             }
-
-            if (reachedStartingPoint == false)
-                return;
-
-
-            currentMovementDelay += Time.deltaTime;
-            movementDelay = 1 / droneManager.metersPS;
-            Battery -= Time.deltaTime;
-            if (currentMovementDelay > movementDelay)
-            {
-                MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
-                Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
-                transform.position = gridManager.GetIndexPosition(coords);
-                traversedCells++;
-
-                if (gridPositionIndex + 1 > traversableGrid[gridIndex].Count - 1)
-                {
-                    gridIndex++;
-                    gridPositionIndex = 0;
-                }
-                else
-                    gridPositionIndex++;
-
-
-                if (Battery < 0)
-                    StartCoroutine(Recharge());
-
-                droneManager.SpaceCleared();
-
-                currentMovementDelay = 0;
-            }
-            else
-                return;
         }
+        #endregion
+
+        #region idle
+        if (behaviour == DroneBehaviour.Idle)
+        {
+
+        }
+        #endregion
+
+        #region charging
+        if (behaviour == DroneBehaviour.Charging)
+        {
+            if (charging == false)
+                StartCoroutine(Recharge());
+        }
+        #endregion
+
+        #region cleaning
+        if (behaviour == DroneBehaviour.Cleaning)
+        {
+            if (gameManager.Playing && traversedCells < TraversableCells.Count)
+            {
+                droneMesh.transform.position = transform.position;
+                currentMovementDelay += Time.deltaTime;
+                movementDelay = 1 / droneManager.metersPS;
+                Battery -= Time.deltaTime;
+                if (currentMovementDelay > movementDelay)
+                {
+                    MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
+                    Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
+
+                    if (Vector3.Distance(transform.position, gridManager.GetIndexPosition(coords)) > .01f)
+                    {
+                        transform.position = Vector3.MoveTowards(transform.position, gridManager.GetIndexPosition(coords), _movementSpeed * Time.deltaTime);
+                    }
+                    else
+                    {
+                        transform.position = gridManager.GetIndexPosition(coords);
+                        traversedCells++;
+
+                        if (gridPositionIndex + 1 > traversableGrid[gridIndex].Count - 1)
+                        {
+                            gridIndex++;
+                            gridPositionIndex = 0;
+                        }
+                        else
+                            gridPositionIndex++;
+
+                        droneManager.SpaceCleared();
+                        currentMovementDelay = 0;
+                    }
+                }
+
+                if (TraversableCells.Count == 0)
+                    behaviour = DroneBehaviour.Idle;
+
+                if (Battery <= 0)
+                {
+                    _prevBehaviour = DroneBehaviour.Cleaning;
+                    behaviour = DroneBehaviour.Charging;
+                }
+            }
+
+        }
+        #endregion
+
+        #region patrolling
+        if (behaviour == DroneBehaviour.Patrolling)
+        {
+            droneMesh.transform.position = transform.position;
+            float d = Vector3.Distance(transform.position, waypointPos[_currentWaypoint]);
+            if (d < _minDist)
+            {
+                if (_currentWaypoint + 1 <= waypointPos.Count - 1)
+                    _currentWaypoint++;
+                else
+                    _currentWaypoint = 0;
+            }
+
+            Battery -= Time.deltaTime;
+
+            if (Battery < 0)
+            {
+                _prevBehaviour = DroneBehaviour.Patrolling;
+                behaviour = DroneBehaviour.Charging;
+            }
+
+            transform.position = Vector3.MoveTowards(transform.position, waypointPos[_currentWaypoint], _movementSpeed * Time.deltaTime);
+        }
+        #endregion
     }
 
     public DroneCharger FindCharger()
@@ -121,7 +194,7 @@ public class MarineDrone : Drone
         Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
         transform.DOMove(gridManager.GetIndexPosition(coords), 5);
         yield return new WaitForSeconds(5);
-        reachedStartingPoint = true;
+        behaviour = DroneBehaviour.Cleaning;
     }
 
     public override void Initialize(Color32 tColor)
@@ -136,6 +209,21 @@ public class MarineDrone : Drone
         return speed;
     }
 
+    public void SetPatrolling()
+    {
+        behaviour = DroneBehaviour.Patrolling;
+    }
+
+    public void SetCleaning()
+    {
+        behaviour = DroneBehaviour.Cleaning;
+    }
+
+    public void SetIdle()
+    {
+        behaviour = DroneBehaviour.Idle;
+    }
+
     void ContsructGrid()
     {
         gridConstructed = true;
@@ -145,9 +233,7 @@ public class MarineDrone : Drone
         for (int i = 0; i < TraversableCells.Count; i++)
         {
             if (TraversableCells[i].xIndex == index)
-            {
                 traversableGrid[gridIndex].Add(TraversableCells[i]);
-            }
             else
             {
                 index++;
@@ -175,34 +261,62 @@ public class MarineDrone : Drone
 
     private IEnumerator Recharge()
     {
+        //chargeLine.SetPosition(0, Charger.transform.position);
+        //chargeLine.SetPosition(1, transform.position);
         Charger = FindCharger();
-        chargeLine.positionCount = 2;
         charging = true;
-        float distance = Vector3.Distance(transform.position, Charger.transform.position);
-        droneMesh.transform.DOMove(Charger.transform.position, distance);
-        yield return new WaitForSeconds(distance);
+
+        while (Vector3.Distance(transform.position, Charger.transform.position) > .1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, Charger.transform.position, _movementSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(5);
         Charger.Charge(ChargeDuration);
         yield return new WaitForSeconds(ChargeDuration);
         Battery = startingBattery;
         MapCellData d = traversableGrid[gridIndex].ElementAt(gridPositionIndex);
         Vector2Int coords = new Vector2Int(d.xIndex, d.yIndex);
-        droneMesh.transform.DOMove(gridManager.GetIndexPosition(coords), distance);
-        yield return new WaitForSeconds(distance + .25f);
-        droneMesh.transform.position = transform.position;
+        if (_prevBehaviour == DroneBehaviour.Cleaning)
+        {
+            while (Vector3.Distance(transform.position, gridManager.GetIndexPosition(coords)) > .1f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, gridManager.GetIndexPosition(coords), _movementSpeed * Time.deltaTime);
+                yield return null;
+            }
+        }
+        else
+        {
+            while (Vector3.Distance(transform.position, waypointPos[_currentWaypoint]) > .1f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, waypointPos[_currentWaypoint], _movementSpeed * Time.deltaTime);
+                yield return null;
+            }
+        }
+
         charging = false;
-        chargeLine.positionCount = 0;
+        behaviour = _prevBehaviour;
+        //chargeLine.positionCount = 0;
     }
 
-    // void OnDrawGizmos()
-    // {
-    //     Gizmos.color = TraversableColor;
+    public void SetWaypoints(List<Vector2Int> w)
+    {
+        foreach (Vector2Int v2 in w)
+        {
+            Vector3 v3 = gridManager.GetIndexPosition(v2);
+            waypointPos.Add(v3);
+            Instantiate(debugCube, v3, Quaternion.identity);
+        }
+    }
+}
 
-    //     if (TraversableCells.Count == 0)
-    //         return;
-
-    //     for (int i = 0; i < TraversableCells.Count; i++)
-    //     {
-    //         Gizmos.DrawWireCube(new Vector3(TraversableCells[i].xPos, 0, TraversableCells[i].zPos), new Vector3(.1f, .1f, .1f));
-    //     }
-    // }
+public enum DroneBehaviour
+{
+    None,
+    Initializing,
+    Idle,
+    Charging,
+    Cleaning,
+    Patrolling
 }

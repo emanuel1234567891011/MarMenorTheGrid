@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a27f054926017a941b8ac0e45612730f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_urp/material/default/cube_man.mat
+  uploadId: 696501

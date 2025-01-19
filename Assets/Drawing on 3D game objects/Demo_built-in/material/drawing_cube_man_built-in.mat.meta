@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 52b4deca9a3ba9540ab84e22525f3533
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_built-in/material/drawing_cube_man_built-in.mat
+  uploadId: 696501

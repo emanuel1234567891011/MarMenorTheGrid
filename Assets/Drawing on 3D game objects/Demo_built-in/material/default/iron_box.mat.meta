@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4ddfd9dc12e3ff74f9a29f5e2d0d1819
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_built-in/material/default/iron_box.mat
+  uploadId: 696501

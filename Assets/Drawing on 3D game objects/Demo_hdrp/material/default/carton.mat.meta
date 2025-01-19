@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2b1fb26c36f0c2144b02ae89e1dac0d6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_hdrp/material/default/carton.mat
+  uploadId: 696501

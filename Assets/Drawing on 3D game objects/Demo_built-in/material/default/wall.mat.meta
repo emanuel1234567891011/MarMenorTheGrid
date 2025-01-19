@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c034e734f519c3b489bd4640b01bbb3a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_built-in/material/default/wall.mat
+  uploadId: 696501

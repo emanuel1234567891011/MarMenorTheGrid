@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 09b233ad34fccbe4c9f2cb43ce755678
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297618
+  packageName: Drawing on 3D game objects
+  packageVersion: 1.0
+  assetPath: Assets/Drawing on 3D game objects/Demo_hdrp/material/drawing_cube_man_hdrp.mat
+  uploadId: 696501

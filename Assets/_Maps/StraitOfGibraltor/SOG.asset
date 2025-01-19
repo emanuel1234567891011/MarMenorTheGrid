@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d11c1d224894cedaf05cd9d24ca729, type: 3}
   m_Name: SOG
   m_EditorClassIdentifier: 
-  mapName: Strait of Gibralter
-  bitmap: {fileID: 2800000, guid: c5f2a67b42a03a215a025b40c8a30af6, type: 3}
-  overlayMap: {fileID: 2800000, guid: be8e6598fc12ea3879983be2712a9a04, type: 3}
+  mapName: Strait of Gibraltar
+  bitmap: {fileID: 2800000, guid: e01478127d4ca3956a55e7d628ae3a20, type: 3}
+  modifiedBitmap: {fileID: 2800000, guid: e01478127d4ca3956a55e7d628ae3a20, type: 3}
+  overlayMap: {fileID: 2800000, guid: 9e45739146734a693b398e9063f92041, type: 3}
   mapWidth: 1200
   mapHeight: 1500
   description: The Strait of Gibraltar[1] is a narrow strait that connects the Atlantic

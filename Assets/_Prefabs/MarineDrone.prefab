@@ -1805,11 +1805,16 @@ MonoBehaviour:
   Velocity: 0
   ChargeDuration: 10
   Battery: 100
+  WasteCollected: 0
+  EnergyConsumed: 0
   Capacity: 1000
   TraversableColor:
     serializedVersion: 2
     rgba: 0
   Charger: {fileID: 0}
+  debugCube: {fileID: 5896803444311931169, guid: fcd49086a6a5f46f5ac7ba19ea49d520,
+    type: 3}
+  behaviour: 0
   droneMesh: {fileID: 8301600806787394101}
   chargeLine: {fileID: 7346330761654892726}
   debug: 0

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapName: Mar Menor
   bitmap: {fileID: 2800000, guid: febc0485674db76d88a3c81362b8dfb5, type: 3}
+  modifiedBitmap: {fileID: 2800000, guid: 92381c788773b45e1b5f6c08f235196a, type: 3}
   overlayMap: {fileID: 2800000, guid: 92381c788773b45e1b5f6c08f235196a, type: 3}
   mapWidth: 1200
   mapHeight: 1500

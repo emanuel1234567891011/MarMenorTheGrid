@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.Linq;
 using System;
 using UnityEngine.UI;
 
@@ -17,14 +18,25 @@ public class DroneManager : MonoBehaviour
     public float metersPS = 5;
 
     public GridManager gridManager;
-    public List<Drone> drones = new List<Drone>();
+    public List<MarineDrone> drones = new List<MarineDrone>();
     private List<DroneCharger> chargers = new List<DroneCharger>();
+    List<Vector2Int> wp = new List<Vector2Int>();
     private List<DroneConfig> droneConfigs = new List<DroneConfig>();
 
     int clearedSpaces = 0;
 
     public int GetDroneCount => drones.Count;
     public int ClearedSpace => clearedSpaces;
+
+    public void SetDronesCleaning()
+    {
+        drones.ForEach(x => x.SetCleaning());
+    }
+
+    public void SetDronesPatrolling()
+    {
+        drones.ForEach(x => x.SetPatrolling());
+    }
 
     public void SpaceCleared()
     {
@@ -43,20 +55,24 @@ public class DroneManager : MonoBehaviour
 
     private void InitializeDrones(List<Vector2Int> chargerLocations)
     {
-        //todo Create a class with default settings from text fields for each drone created
-        //todo Assign each new drone a class, pair it with an icon
-        //todo if the icon is pressed, show panel
-        //todo button press to change the info class
-
         drones = gridManager.GetDrones;
-
-        //todo add configs.
-
         for (int i = 0; i < chargerLocations.Count; i++)
         {
             DroneCharger dc = Instantiate(ChargerPrefab, gridManager.GetChargerPosition(chargerLocations[i]), Quaternion.identity);
             chargers.Add(dc);
         }
+    }
+
+    public void AddWaypoints(List<Vector2Int> w)
+    {
+        wp = new List<Vector2Int>(w);
+    }
+
+    public void AssignWaypoints()
+    {
+        drones = new List<MarineDrone>(FindObjectsByType<MarineDrone>(FindObjectsSortMode.None).ToList());
+        foreach (MarineDrone d in drones)
+            d.SetWaypoints(wp);
     }
 
     public void AddDroneConfig(int iconIndex)
